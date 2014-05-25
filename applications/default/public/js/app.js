@@ -17,6 +17,9 @@ var dependencies = [
 // Declare main choko module.
 angular.module('choko', dependencies)
 
+  // Define current choko version. 
+  .value('version', '0.0.1')
+
   /**
    * Configures the location provider.
    * @param  {object} $locationProvider

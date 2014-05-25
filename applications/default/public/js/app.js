@@ -1,5 +1,5 @@
-/*
- * Main choko application definition file.
+/**
+ * @file Main AngularJS module for the choko application.
  */
 
 'use strict';
@@ -11,7 +11,6 @@ var dependencies = [
   'ngSanitize',
   'summernote',
   'choko.services',
-  'choko.directives',
   'choko.filters'
 ];
 
@@ -19,7 +18,8 @@ var dependencies = [
 angular.module('choko', dependencies)
 
   /**
-   * Main configuration.
+   * Configures the location provider.
+   * @param  {object} $locationProvider
    */
   .config(['$locationProvider', function($locationProvider) {
 

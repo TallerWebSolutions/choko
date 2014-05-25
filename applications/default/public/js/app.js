@@ -9,8 +9,7 @@ var dependencies = [
   'ngRoute',
   'ngResource',
   'ngSanitize',
-  'summernote',
-  'choko.filters'
+  'summernote'
 ];
 
 // Declare main choko module.

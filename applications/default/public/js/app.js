@@ -10,7 +10,6 @@ var dependencies = [
   'ngResource',
   'ngSanitize',
   'summernote',
-  'choko.services',
   'choko.filters'
 ];
 

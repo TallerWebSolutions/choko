@@ -5,13 +5,18 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 var program = require('commander');
-var Server = require('../lib/server');
 
 program
   .version('0.0.4')
   .usage('[options] [dir]')
   .option('-p, --port <number>', 'start server at specified port', parseInt, 3000)
+  .option('-m, --mode <items>', 'Define a specific mode to run the application', function (value) {
+    return value.split(',');
+  })
   .parse(process.argv);
+
+// Require server later for it to have access to cli options.
+var Server = require('../lib/server');
 
 // If a dirname wasn't passed, run applications in current folder.
 var dir = program.args.length ? path.normalize(program.args[0]) : path.normalize(process.cwd());

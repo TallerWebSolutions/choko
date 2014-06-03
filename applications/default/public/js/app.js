@@ -22,9 +22,22 @@ angular.module('choko', dependencies)
   .value('version', '0.0.4')
 
   // Location/routing configuration.
-  .config(['$locationProvider', function($locationProvider) {
+  .config(['$locationProvider', '$httpProvider', function($locationProvider, $httpProvider) {
 
     // Use HTML5 mode to remove "#" symbols from angular-routed pages.
     // $locationProvider.html5Mode(true);
+
+    // 
+    $httpProvider.interceptors.push(function (applicationState) {
+      return {
+        request: function (config) {
+          return angular.extend(config, {
+            params: {
+              contexts: applicationState.get().contexts || []
+            }
+          });
+        }
+      }
+    })
 
   }]);

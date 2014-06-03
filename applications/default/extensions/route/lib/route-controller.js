@@ -43,6 +43,12 @@ RouteController.prototype.handle = function(request, response) {
   var self = this;
   var settings = this.settings;
 
+  // @todo: should this parsing be done in a more global middleware?
+  if (request.query && request.query.contexts) {
+    request.contexts = request.query.contexts;
+    delete request.query.contexts;
+  }
+
   this.access(request, response, function(err, allow) {
     if (err) {
       RouteController.error.call(self, request, response, err);

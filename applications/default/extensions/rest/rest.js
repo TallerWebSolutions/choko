@@ -52,6 +52,13 @@ rest.route = function(routes, callback) {
     newRoutes['/rest' + type.path] = {
       access: true,
       callback: function(request, response, callback) {
+
+        // @todo: should this parsing be done in a more global middleware?
+        if (request.query && request.query.contexts) {
+          request.contexts = request.query.contexts;
+          delete request.query.contexts;
+        }
+
         if (request.method == 'GET') {
           // @todo: filter out dangerous stuff from query before passing it to
           // list() method?

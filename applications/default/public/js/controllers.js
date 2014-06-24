@@ -14,7 +14,11 @@ function ApplicationController($scope, $location, $http, applicationState, Choko
     .success(function(data, status, headers, config) {
       if (data.data.redirect) {
         // Server returned a redirect.
-        return $location.path(data.data.redirect);
+        if (data.data.url) {
+          return window.location.href = data.data.redirect;
+        }else{
+          return $location.path(data.data.redirect);
+        };
       }
 
       // Rebuild the layout only when context changes.

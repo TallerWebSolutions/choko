@@ -72,7 +72,7 @@ function PanelController($scope, $location, $http, applicationState, Choko) {
 function PageController($scope, $location, $http, applicationState, Choko) {
   if (!$scope.page.type || $scope.page.type === 'default') {
     $scope.items = $scope.page.items || {};
-    $scope.title = $scope.page.title;
+    $scope.page.title = $scope.title['title'] || $scope.page.title;
   }
   else {
     // Set view to the panel itself and call ViewController.

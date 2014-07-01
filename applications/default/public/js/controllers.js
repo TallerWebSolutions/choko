@@ -14,7 +14,11 @@ function ApplicationController($scope, $location, $http, applicationState, Choko
     .success(function(data, status, headers, config) {
       if (data.data.redirect) {
         // Server returned a redirect.
-        return $location.path(data.data.redirect);
+        if (data.data.url) {
+          return window.location.href = data.data.redirect;
+        }else{
+          return $location.path(data.data.redirect);
+        };
       }
 
       // Rebuild the layout only when context changes.
@@ -72,7 +76,7 @@ function PanelController($scope, $location, $http, applicationState, Choko) {
 function PageController($scope, $location, $http, applicationState, Choko) {
   if (!$scope.page.type || $scope.page.type === 'default') {
     $scope.items = $scope.page.items || {};
-    $scope.title = $scope.page.title;
+    $scope.page.title = $scope.title ? $scope.title['title'] : $scope.page.title;
   }
   else {
     // Set view to the panel itself and call ViewController.

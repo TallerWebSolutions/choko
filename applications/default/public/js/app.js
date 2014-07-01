@@ -27,7 +27,8 @@ angular.module('choko', dependencies)
     // Use HTML5 mode to remove "#" symbols from angular-routed pages.
     // $locationProvider.html5Mode(true);
 
-    // 
+    // @todo: This line cause problems with contexts.
+    /*
     $httpProvider.interceptors.push(function (applicationState) {
       return {
         request: function (config) {
@@ -39,5 +40,6 @@ angular.module('choko', dependencies)
         }
       }
     })
+    */
 
   }]);

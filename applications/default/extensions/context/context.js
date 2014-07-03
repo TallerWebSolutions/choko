@@ -59,6 +59,10 @@ context.type = function(types, callback) {
           titleField: 'type'
         }
       },
+      matchAll: {
+        title: 'Match all conditions',
+        type: 'boolean',
+      },
       reactions: {
         title: 'Reactions',
         type: 'reference',
@@ -81,20 +85,27 @@ context.type = function(types, callback) {
       execute: function(request, response, callback) {
         var self = this;
 
-        // Call callback bellow on the first conditionType that pass.
-        // @todo: Eventually we may want to add an operator and also allow OR
-        // and ANDs.
+        // Initialize conditions.
         this.conditions = this.conditions || {};
-        async.detect(Object.keys(this.conditions), function(conditionTypeName, next) {
+
+        var conditionTypeNames = Object.keys(this.conditions);
+
+        // Call callback bellow on the first conditionType that pass, if
+        // matchAll is enabled all conditions must pass.
+        var method = this.matchAll ? 'filter' : 'detect';
+        async[method](conditionTypeNames, function(conditionTypeName, next) {
           self.application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
             conditionType.check(request, self.conditions[conditionTypeName], function(match) {
               next(match);
             });
           });
         }, function(result) {
-          if (!result) {
+          // If none matches or 'matchAll' is enabled and not all conditions
+          // matches, return false.
+          if (!result || (self.matchAll && result.length != conditionTypeNames.length)) {
             return callback(false);
           }
+
           self.reactions = self.reactions || {};
           async.each(Object.keys(self.reactions), function(reactionTypeName, next) {
             self.application.load('contextReactionType', reactionTypeName, function(err, reactionType) {
@@ -211,6 +222,62 @@ context.contextConditionType = function(conditionTypes, callback) {
       var regex = expressUtils.pathRegexp(urls);
       async.detect(urls, function(url, next) {
         next(regex.exec(request.url));
+      }, function(result) {
+        callback(result !== undefined);
+      });
+    }
+  };
+
+  newConditionTypes['and'] = {
+    title: 'And',
+    standalone: false,
+    fields: {
+      value: {
+        title: 'Conditions',
+        type: 'reference',
+        reference: {
+          type: 'contextCondition',
+          multiple: true,
+          inline: true
+        }
+      }
+    },
+    check: function(request, conditions, callback) {
+      var conditionTypeNames = Object.keys(conditions);
+      async.filter(conditionNames, function(conditionTypeName, next) {
+        application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
+          conditionType.check(request, conditions[conditionTypeName], function(match) {
+            next(match);
+          });
+        });
+      }, function(result) {
+        // Check if all conditions passed.
+        callback(result.length == conditionTypeNames.length);
+      });
+    }
+  };
+
+  newConditionTypes['or'] = {
+    title: 'Or',
+    standalone: false,
+    fields: {
+      value: {
+        title: 'Conditions',
+        type: 'reference',
+        reference: {
+          type: 'contextCondition',
+          multiple: true,
+          inline: true
+        }
+      }
+    },
+    check: function(request, conditions, callback) {
+      async.detect(Object.keys(conditions), function(conditionTypeName, next) {
+        application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
+          conditionType.check(request, conditions[conditionTypeName], function(match) {
+            next(match);
+          });
+        });
       }, function(result) {
         callback(result !== undefined);
       });

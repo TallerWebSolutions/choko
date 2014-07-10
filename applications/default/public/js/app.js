@@ -4,7 +4,6 @@
 
 'use strict';
 
-<<<<<<< HEAD
 // Define core choko dependencies.
 var dependencies = [
   'ngRoute',
@@ -44,10 +43,3 @@ angular.module('choko', dependencies)
     */
 
   }]);
-=======
-// Declare app level module which depends on services, directives and filters.
-angular.module('choko', ['ngRoute', 'ngResource', 'ngSanitize', 'summernote', 'angularFileUpload', 'choko.services', 'choko.directives', 'choko.filters', 'choko.controllers'])
-.config(['$locationProvider', function($locationProvider) {
-  //$locationProvider.html5Mode(true);
-}]);
->>>>>>> fs/angular-controllers

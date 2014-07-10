@@ -324,8 +324,12 @@ angular.module('choko')
       };
     }])
 
-  .controller('ViewController', ['$scope', '$location', '$http', 'Choko',
-    function ($scope, $location, $http, Choko) {
+  .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Params',
+    function ($scope, $location, $http, Choko, Params) {
+
+      if (typeof $scope.view.itemKey !== 'undefined') {
+        $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);
+      }
 
       // Handle 'list' type views.
       if ($scope.view.type === 'list' && $scope.view.itemType) {
@@ -472,4 +476,4 @@ angular.module('choko')
           ['table', ['table']]
         ]
       };
-    }])
+    }]);

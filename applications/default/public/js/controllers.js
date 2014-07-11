@@ -327,9 +327,15 @@ angular.module('choko')
   .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Params',
     function ($scope, $location, $http, Choko, Params) {
 
+      // Parse parameters when needed.
       if (typeof $scope.view.itemKey !== 'undefined') {
         $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);
       }
+
+      // Parse other params.
+      Object.keys($scope.view.params || {}).forEach(function (param) {
+        $scope.view.params[param] = Params.parse($scope.view.params[param], $scope);
+      });
 
       // Handle 'list' type views.
       if ($scope.view.type === 'list' && $scope.view.itemType) {

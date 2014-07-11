@@ -133,6 +133,11 @@ angular.module('choko')
               result = param[key];
             }
 
+            // Handle error.
+            if (!injectedParsers[key]) {
+              throw new Error('Undefined parameter parser "' + key + '".')
+            }
+
             // Parse the value.
             result = injectedParsers[key].apply(injectedParsers, [result].concat(args));
           });

@@ -47,7 +47,7 @@ angular.module('choko')
   // Parameter Parser service that can be extend by extensions.
   .provider('Params', function () {
 
-    // Parser functions work most like Angular filter: they are injectable
+    // Parser functions work most like Angular filters: they are injectable
     // functions that return the actual function for parsing. This returned
     // function will be provided with the param for parsing.
     var parsers = {};
@@ -59,8 +59,8 @@ angular.module('choko')
       parsers[name] = parser
     };
 
-    // Regiter the default page param parser.
-    this.addParser('pageParam', function () {
+    // Register the default url param parser.
+    this.addParser('url', function () {
       return function (param, $scope) {
         return $scope.page && $scope.page.params && $scope.page.params[param] || null;
       }
@@ -103,7 +103,7 @@ angular.module('choko')
 
             // If there is a dynamic param but no pipe action, fill with default.
             if (!pipes.length && ~param.indexOf(':')) {
-              pipes.push('pageParam');
+              pipes.push('url');
             }
             // If there is no dynamic param nor pipes, param is already parsed.
             else if (!pipes.length) {

@@ -4,4 +4,19 @@
 angular.module('choko', ['ngRoute', 'ngResource', 'ngSanitize', 'summernote', 'angularFileUpload', 'choko.services', 'choko.directives', 'choko.filters'])
 .config(['$locationProvider', function($locationProvider) {
   //$locationProvider.html5Mode(true);
+}])
+.config(['$httpProvider', function ($httpProvider) {
+  $httpProvider.interceptors.push(function (applicationState) {
+    return {
+      request: function (config) {
+        angular.extend(config, {
+          params: {
+            contexts: applicationState.get().contexts || []
+          }
+        });
+
+        return config;
+      }
+    }
+  })
 }]);

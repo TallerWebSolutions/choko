@@ -52,6 +52,7 @@ rest.route = function(routes, callback) {
     newRoutes['/rest' + type.path] = {
       access: true,
       callback: function(request, response, callback) {
+
         if (request.method == 'GET') {
           // @todo: filter out dangerous stuff from query before passing it to
           // list() method?

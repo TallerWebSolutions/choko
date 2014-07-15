@@ -139,7 +139,7 @@ RouteController.respond = function(request, response, content, code) {
   };
 
   if (content) {
-    responseData.payload.data = content;
+    payload.data = content;
   }
 
   // Run responseAlter() hook on all extensions.

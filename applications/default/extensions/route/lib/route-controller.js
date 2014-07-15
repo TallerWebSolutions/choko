@@ -132,14 +132,9 @@ RouteController.respond = function(request, response, content, code) {
 
   // Set defaults.
   code = typeof code != 'undefined' ? code : 200;
-  var responseData = {
-    request: request,
-    response: response,
-    code: code,
-    payload: {
-      status: {
-        code: code
-      }
+  var payload = {
+    status: {
+      code: code
     }
   };
 
@@ -148,8 +143,8 @@ RouteController.respond = function(request, response, content, code) {
   }
 
   // Run responseAlter() hook on all extensions.
-  this.application.invoke('responseAlter', responseData, function() {
-    response.send(responseData.code, responseData.payload);
+  this.application.invoke('responseAlter', payload, request, response, function() {
+    response.send(payload.status.code, payload);
   });
 };
 

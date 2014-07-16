@@ -5,7 +5,7 @@
 'use strict';
 
 angular.module('choko')
-  
+
   .controller('ApplicationController', ['$scope', '$location', '$http', 'applicationState',
     function ($scope, $location, $http, applicationState) {
       $scope.state = {};
@@ -163,8 +163,8 @@ angular.module('choko')
       $scope.field.template = $scope.field.template || '/templates/' + $scope.field.format + '.html';
     }])
 
-  .controller('ReferenceElementController', ['$scope',
-    function ($scope) {
+  .controller('ReferenceElementController', ['$scope', 'Choko',
+    function ($scope, Choko) {
       Choko.get({type: $scope.element.reference.type}, function(response) {
         $scope.element.options = response;
 

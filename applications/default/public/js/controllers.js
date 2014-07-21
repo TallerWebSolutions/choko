@@ -395,6 +395,11 @@ angular.module('choko')
             url += '/' + $scope.view.itemKey;
           }
 
+          // Add params to data if any.
+          Object.keys($scope.view.params || {}).forEach(function (param) {
+            $scope.data[param] = $scope.data[param] || $scope.view.params[param];
+          });
+
           $http.post(url, $scope.data)
             .success(function(data, status, headers, config) {
               $scope.data = data;

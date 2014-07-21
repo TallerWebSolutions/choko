@@ -246,9 +246,9 @@ panel.contextReactionType = function(reactionTypes, callback) {
 };
 
 /**
- * The responseAlter() hook.
+ * The response() hook.
  */
-panel.responseAlter = function (payload, request, response, callback) {
+panel.response = function (payload, request, response, callback) {
 
   var layout = payload.data && payload.data.layout; 
   var panels = payload.data && payload.data.panels;
@@ -260,9 +260,9 @@ panel.responseAlter = function (payload, request, response, callback) {
      */
     function findContent(region, childType) {
 
-      // Consider empty by default, unless when region it told to always be
-      // visible.
-      region.empty = region.alwaysVisible ? false : true;
+      // Consider empty by default, unless when region is told to always be
+      // rendered.
+      region.empty = region.alwaysRender ? false : true;
 
       // Check if region has content.
       if (region.empty && region.region == true) {

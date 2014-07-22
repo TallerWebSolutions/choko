@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-console.log('test 5');
-
 var os = require('os');
 var fs = require('fs');
 var path = require('path');

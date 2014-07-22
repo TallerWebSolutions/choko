@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-console.log('oopas');
+console.log('test 5');
 
 var os = require('os');
 var fs = require('fs');

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+console.log('oooopa');
+
 var os = require('os');
 var fs = require('fs');
 var path = require('path');

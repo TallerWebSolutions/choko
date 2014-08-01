@@ -346,7 +346,7 @@ angular.module('choko')
           params[param] = $scope.view.params[param];
         });
 
-        Choko.get({type: $scope.view.itemType}, function(response) {
+        Choko.get(params, function(response) {
           $scope.items = response;
           $scope.items.$empty = Object.keys($scope.items).filter(function (key) {
             return key.indexOf('$') != 0;

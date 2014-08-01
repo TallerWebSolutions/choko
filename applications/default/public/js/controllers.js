@@ -346,8 +346,11 @@ angular.module('choko')
           params[param] = $scope.view.params[param];
         });
 
-        Choko.get(params, function(response) {
+        Choko.get({type: $scope.view.itemType}, function(response) {
           $scope.items = response;
+          $scope.items.$empty = Object.keys($scope.items).filter(function (key) {
+            return key.indexOf('$') != 0;
+          }).length ? false : true;
         });
 
         if (!$scope.view.template && $scope.view.listStyle) {

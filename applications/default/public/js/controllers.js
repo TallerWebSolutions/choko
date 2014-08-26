@@ -165,7 +165,16 @@ angular.module('choko')
 
   .controller('ReferenceElementController', ['$scope', 'Choko',
     function ($scope, Choko) {
-      Choko.get({type: $scope.element.reference.type}, function(response) {
+
+      var query = {
+        type: $scope.element.reference.type
+      };
+
+      if ($scope.element.reference.query) {
+        angular.extend(query, $scope.element.reference.query);
+      }
+
+      Choko.get(query, function(response) {
         $scope.element.options = response;
 
         // Use radios if less then 5 options.
@@ -339,14 +348,19 @@ angular.module('choko')
 
       // Handle 'list' type views.
       if ($scope.view.type === 'list' && $scope.view.itemType) {
+        var query = {
+          type: $scope.view.itemType
+        };
+
+        if ($scope.view.query) {
+          angular.extend(query, $scope.view.query);
+        }
+
+        angular.extend(query, $scope.view.params);
+
         $scope.items = {};
 
-        var params = {type: $scope.view.itemType};
-        Object.keys($scope.view.params || {}).forEach(function (param) {
-          params[param] = $scope.view.params[param];
-        });
-
-        Choko.get(params, function(response) {
+        Choko.get(query, function(response) {
           $scope.items = response;
           $scope.items.$empty = Object.keys($scope.items).filter(function (key) {
             return key.indexOf('$') != 0;

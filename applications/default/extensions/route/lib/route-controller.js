@@ -141,7 +141,11 @@ RouteController.respond = function(request, response, content, code) {
     payload.data = content;
   }
 
-  response.status(code).send(payload);
+  // Run response() hook on all extensions.
+  this.application.invoke('response', payload, request, response, function() {
+    response.status(code).send(payload);
+  });
+
 };
 
 /**

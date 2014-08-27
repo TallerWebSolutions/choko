@@ -52,35 +52,41 @@ RouteController.prototype.handle = function(request, response) {
   var self = this;
   var settings = this.settings;
 
+  // @todo: should this parsing be done in a more global middleware?
+  if (request.query && request.query.contexts) {
+    request.contexts = request.query.contexts;
+    delete request.query.contexts;
+  }
+
   this.access(request, response, function(err, allow) {
     if (err) {
-      RouteController.error(request, response, err);
+      RouteController.error.call(self, request, response, err);
     }
 
     if (allow) {
       // A route can have either a content or callback property.
       if (settings.content) {
-        RouteController.respond(request, response, settings.content);
+        RouteController.respond.call(self, request, response, settings.content);
       }
       else if (settings.callback) {
         settings.callback(request, response, function(err, content, code) {
           if (err) {
-            RouteController.error(request, response, err);
+            RouteController.error.call(self, request, response, err);
           }
 
           if (content) {
-            RouteController.respond(request, response, content, code);
+            RouteController.respond.call(self, request, response, content, code);
           }
           else {
             // If there's no content, return 404 error.
-            RouteController.notFound(request, response);
+            RouteController.notFound.call(self, request, response);
           }
         });
       }
     }
     else {
       // Access denied.
-      RouteController.forbidden(request, response);
+      RouteController.forbidden.call(self, request, response);
     }
   });
 };
@@ -125,7 +131,6 @@ RouteController.prototype.access = function(request, response, callback) {
 RouteController.respond = function(request, response, content, code) {
   // Default to 200 (success).
   var code = code || 200;
-
   var payload = {
     status: {
       code: code
@@ -136,7 +141,11 @@ RouteController.respond = function(request, response, content, code) {
     payload.data = content;
   }
 
-  response.send(code, payload);
+  // Run response() hook on all extensions.
+  this.application.invoke('response', payload, request, response, function() {
+    response.status(code).send(payload);
+  });
+
 };
 
 /**
@@ -146,7 +155,7 @@ RouteController.respond = function(request, response, content, code) {
  * @param {Response} response Response object.
  */
 RouteController.error = function(request, response, error) {
-  RouteController.respond(request, response, {
+  RouteController.respond.call(this, request, response, {
     title: 'Server error',
     description: "The server couldn't process the request.",
     error: error.toString()
@@ -160,7 +169,7 @@ RouteController.error = function(request, response, error) {
  * @param {Response} response Response object.
  */
 RouteController.notFound = function(request, response) {
-  RouteController.respond(request, response, {
+  RouteController.respond.call(this, request, response, {
     title: 'Page not found',
     description: "The page you're looking for wasn't found."
   }, 404);
@@ -173,7 +182,7 @@ RouteController.notFound = function(request, response) {
  * @param {Response} response Response object.
  */
 RouteController.forbidden = function(request, response) {
-  RouteController.respond(request, response, {
+  RouteController.respond.call(this, request, response, {
     title: 'Forbidden',
     description: "You don't have permission to access this page."
   }, 403);

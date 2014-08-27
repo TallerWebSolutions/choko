@@ -1,5 +1,5 @@
 var async = require('async');
-var expressUtils = require('express/lib/utils');
+var pathToRegexp = require('path-to-regexp');
 var contextMiddleware = require('./lib/contextMiddleware');
 
 var context = module.exports;
@@ -220,7 +220,7 @@ context.contextConditionType = function(conditionTypes, callback) {
     },
     check: function(request, urls, callback) {
       // Use express regex to match URL.
-      var regex = expressUtils.pathRegexp(urls);
+      var regex = pathToRegexp(urls);
       async.detect(urls, function(url, next) {
         next(regex.exec(request.url));
       }, function(result) {
@@ -324,6 +324,23 @@ context.contextReactionType = function(reactionTypes, callback) {
     },
     react: function(request, response, scripts, callback) {
       response.payload.scripts = response.payload.scripts ? response.payload.scripts.merge(scripts) : scripts;
+      callback();
+    }
+  };
+
+  newReactionTypes['pageTitle'] = {
+    title: 'Set page title',
+    description: 'Set the title of the page.',
+    standalone: false,
+    fields: {
+      title: {
+        title: 'Title',
+        description: 'Page title.',
+        type: 'text'
+      }
+    },
+    react: function(request, response, title, callback) {
+      response.payload.title = title;
       callback();
     }
   };

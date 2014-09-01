@@ -1,53 +1,61 @@
+/**
+ * @file Choko core controllers.
+ */
+
 'use strict';
 
-angular.module('choko.controllers', [])
+angular.module('choko')
 
-  .controller('ApplicationController', ['$scope', '$location', '$http', 'applicationState',
-    function ($scope, $location, $http, applicationState) {
-      $scope.state = {};
+  .controller('ApplicationController', ['$rootScope', '$location', '$http', 'applicationState',
+    function ($rootScope, $location, $http, applicationState) {
+      $rootScope.state = {};
 
-      $scope.changeState = function() {
+      $rootScope.changeState = function() {
         var path = (!$location.path() || $location.path() == '/') ? '/home' : $location.path();
 
         $http.get(path)
         .success(function(data, status, headers, config) {
           if (data.data.redirect) {
             // Server returned a redirect.
-            return $location.path(data.data.redirect);
+            if (data.data.url) {
+              return window.location.href = data.data.redirect;
+            } else {
+              return $location.path(data.data.redirect);
+            };
           }
 
           // Rebuild the layout only when context changes.
-          if ($scope.contexts instanceof Array && $scope.contexts.toString() == data.data.contexts.toString()) {
+          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.data.contexts.toString()) {
             // Update only panels in content region, and page information.
             // @todo: get the region the page-content panel is attached to
             // dinamically currently this is hadcoded to 'content' and will not work
             // if the page-content panel is attacehd to a different region.
-            $scope.panels['content'] = data.data.panels['content'];
-            $scope.page = data.data.page;
+            $rootScope.panels['content'] = data.data.panels['content'];
+            $rootScope.page = data.data.page;
           }
           else {
             // Merge data from the server.
-            angular.extend($scope, data.data);
+            angular.extend($rootScope, data.data);
 
             // Store scope as application state.
-            applicationState.set($scope);
+            applicationState.set($rootScope);
           }
         })
         .error(function(data, status, headers, config) {
           // Merge data from the server.
-          angular.extend($scope.page, data.data);
+          angular.extend($rootScope.page, data.data);
 
-          $scope.page.template = '/templates/error.html';
+          $rootScope.page.template = '/templates/error.html';
 
           // Store scope as application state.
-          applicationState.set($scope);
+          applicationState.set($rootScope);
         });
       }
 
-      $scope.$watch(function() {
+      $rootScope.$watch(function() {
         return $location.path();
       }, function(){
-        $scope.changeState();
+        $rootScope.changeState();
       });
     }])
 
@@ -64,7 +72,11 @@ angular.module('choko.controllers', [])
       }
 
       if ($scope.panel.bare) {
-        $scope.template = $scope.panel.template || 'templates/panel-content.html';
+        if ($scope.panel.html === false) {
+          $scope.template = $scope.panel.template || 'templates/panel-content-no-html.html';
+        } else {
+          $scope.template = $scope.panel.template || 'templates/panel-content.html';
+        }
       }
       else {
         $scope.template = 'templates/panel.html';
@@ -153,6 +165,7 @@ angular.module('choko.controllers', [])
 
   .controller('ReferenceElementController', ['$scope', 'Choko',
     function ($scope, Choko) {
+
       var query = {
         type: $scope.element.reference.type
       };
@@ -320,8 +333,8 @@ angular.module('choko.controllers', [])
       };
     }])
 
-  .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular',
-    function ($scope, $location, $http, Choko, Restangular) {
+  .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params',
+    function ($scope, $location, $http, Choko, Restangular, Params) {
 
       // Prevente creation of service if no itemType set.
       if ($scope.view.itemType) {
@@ -329,6 +342,16 @@ angular.module('choko.controllers', [])
         var itemTypeREST = Restangular.service($scope.view.itemType);
         $scope.viewREST = itemTypeREST;
       }
+
+      // Parse parameters when needed.
+      if (typeof $scope.view.itemKey !== 'undefined') {
+        $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);
+      }
+
+      // Parse other params.
+      Object.keys($scope.view.params || {}).forEach(function (param) {
+        $scope.view.params[param] = Params.parse($scope.view.params[param], $scope);
+      });
 
       // Handle 'list' type views.
       if ($scope.view.type === 'list' && $scope.view.itemType) {
@@ -338,10 +361,15 @@ angular.module('choko.controllers', [])
           angular.extend(query, $scope.view.query);
         }
 
+        angular.extend(query, $scope.view.params);
+
         $scope.items = {};
 
         itemTypeREST.getList(query).then(function(response) {
           $scope.items = response;
+          $scope.items.$empty = Object.keys($scope.items).filter(function (key) {
+            return key.indexOf('$') != 0;
+          }).length ? false : true;
         });
 
         if (!$scope.view.template && $scope.view.listStyle) {
@@ -393,6 +421,11 @@ angular.module('choko.controllers', [])
         $scope.submit = function(url, redirect) {
 
           var formREST = null;
+
+          // Add params to data if any.
+          Object.keys($scope.view.params || {}).forEach(function (param) {
+            $scope.data[param] = $scope.data[param] || $scope.view.params[param];
+          });
 
           if(!itemTypeREST) {
             formREST = Restangular.oneUrl('url', url).post('', $scope.data);
@@ -486,4 +519,4 @@ angular.module('choko.controllers', [])
           ['table', ['table']]
         ]
       };
-    }])
+    }]);

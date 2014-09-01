@@ -94,6 +94,7 @@ rest.route = function(routes, callback) {
     // List or add items.
     newRoutes['/rest' + type.path] = {
       callback: function(request, response, callback) {
+
         if (request.method == 'GET') {
           // @todo: filter out dangerous stuff from query before passing it to
           // list() method?

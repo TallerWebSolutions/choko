@@ -16,6 +16,11 @@ var dependencies = [
 
 // Declare main choko module.
 angular.module('choko', dependencies)
+  
+  // Define current choko version.
+  // @todo: we should read package.json and make available not only a version
+  // value but other metadata that might be used thoughout the application.
+  .value('version', '0.0.4')
 
   // Location/routing configuration.
   .config(['$locationProvider', function($locationProvider) {

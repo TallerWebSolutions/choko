@@ -327,6 +327,7 @@ angular.module('choko.controllers', [])
       if ($scope.view.itemType) {
         // Create a new Service for Itemtype.
         var itemTypeREST = Restangular.service($scope.view.itemType);
+        $scope.viewREST = itemTypeREST;
       }
 
       // Handle 'list' type views.

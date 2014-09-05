@@ -340,7 +340,6 @@ angular.module('choko')
       if ($scope.view.itemType) {
         // Create a new Service for Itemtype.
         var itemTypeREST = Restangular.service($scope.view.itemType);
-        $scope.viewREST = itemTypeREST;
       }
 
       // Parse parameters when needed.
@@ -410,9 +409,10 @@ angular.module('choko')
       if ($scope.view.type === 'form' && $scope.view.formName) {
         $scope.data = {};
         var typeForm = 'post';
+        var REST = null;
 
         if ($scope.view.itemType && $scope.view.itemKey) {
-          itemTypeREST.one($scope.view.itemKey).then(function(response) {
+          itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
             $scope.data = response;
             typeForm = 'put'
           });
@@ -427,11 +427,14 @@ angular.module('choko')
             $scope.data[param] = $scope.data[param] || $scope.view.params[param];
           });
 
-          if(!itemTypeREST) {
+          if(!itemTypeREST || url) {
             formREST = Restangular.oneUrl('url', url).post('', $scope.data);
-          }
-          else {
-            formREST = typeForm == 'post'? itemTypeREST.post($scope.data) : itemTypeREST.put($scope.data);
+          } else {
+            if (typeForm == 'post') {
+              formREST = itemTypeREST.post($scope.data);
+            } else {
+              formREST = $scope.data.customPUT($scope.data, $scope.view.itemKey);
+            }
           }
 
           formREST.then(function(response) {

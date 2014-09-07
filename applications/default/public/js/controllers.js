@@ -409,7 +409,6 @@ angular.module('choko')
       if ($scope.view.type === 'form' && $scope.view.formName) {
         $scope.data = {};
         var typeForm = 'post';
-        var REST = null;
 
         if ($scope.view.itemType && $scope.view.itemKey) {
           itemTypeREST.one($scope.view.itemKey).get().then(function(response) {

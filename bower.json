@@ -11,6 +11,7 @@
     "summernote": "0.5.x",
     "angular-summernote": "0.2.x",
     "ng-file-upload": "1.6.x",
+    "lodash": "~2.4.1",
     "restangular": "1.4.x"
   }
 }

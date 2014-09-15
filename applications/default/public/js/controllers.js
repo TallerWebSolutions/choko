@@ -341,7 +341,6 @@ angular.module('choko')
         // Create a new Service for Itemtype.
         var itemTypeREST = Restangular.service($scope.view.itemType);
       }
-
       // Parse parameters when needed.
       if (typeof $scope.view.itemKey !== 'undefined') {
         $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);

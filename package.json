@@ -26,11 +26,13 @@
     "passport": "0.1.x",
     "passport-local": "0.1.x",
     "passport-http": "0.2.x",
+    "passport-anonymous": "1.0.x",
     "validator": "2.0.x",
     "mkdirp": "0.3.x",
     "node-uuid": "1.4.x",
     "lodash": "2.x.x",
-    "cors": "^2.4.1"
+    "cors": "^2.4.1",
+    "connect-multiparty": "1.2.4"
   },
   "devDependencies": {
     "mocha": "*",

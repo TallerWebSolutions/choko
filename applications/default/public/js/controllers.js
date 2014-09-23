@@ -1,53 +1,61 @@
+/**
+ * @file Choko core controllers.
+ */
+
 'use strict';
 
-angular.module('choko.controllers', [])
+angular.module('choko')
 
-  .controller('ApplicationController', ['$scope', '$location', '$http', 'applicationState',
-    function ($scope, $location, $http, applicationState) {
-      $scope.state = {};
+  .controller('ApplicationController', ['$rootScope', '$location', '$http', 'applicationState',
+    function ($rootScope, $location, $http, applicationState) {
+      $rootScope.state = {};
 
-      $scope.changeState = function() {
+      $rootScope.changeState = function() {
         var path = (!$location.path() || $location.path() == '/') ? '/home' : $location.path();
 
         $http.get(path)
         .success(function(data, status, headers, config) {
           if (data.data.redirect) {
             // Server returned a redirect.
-            return $location.path(data.data.redirect);
+            if (data.data.url) {
+              return window.location.href = data.data.redirect;
+            } else {
+              return $location.path(data.data.redirect);
+            };
           }
 
           // Rebuild the layout only when context changes.
-          if ($scope.contexts instanceof Array && $scope.contexts.toString() == data.data.contexts.toString()) {
+          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.data.contexts.toString()) {
             // Update only panels in content region, and page information.
             // @todo: get the region the page-content panel is attached to
             // dinamically currently this is hadcoded to 'content' and will not work
             // if the page-content panel is attacehd to a different region.
-            $scope.panels['content'] = data.data.panels['content'];
-            $scope.page = data.data.page;
+            $rootScope.panels['content'] = data.data.panels['content'];
+            $rootScope.page = data.data.page;
           }
           else {
             // Merge data from the server.
-            angular.extend($scope, data.data);
+            angular.extend($rootScope, data.data);
 
             // Store scope as application state.
-            applicationState.set($scope);
+            applicationState.set($rootScope);
           }
         })
         .error(function(data, status, headers, config) {
           // Merge data from the server.
-          angular.extend($scope.page, data.data);
+          angular.extend($rootScope.page, data.data);
 
-          $scope.page.template = '/templates/error.html';
+          $rootScope.page.template = '/templates/error.html';
 
           // Store scope as application state.
-          applicationState.set($scope);
+          applicationState.set($rootScope);
         });
       }
 
-      $scope.$watch(function() {
+      $rootScope.$watch(function() {
         return $location.path();
       }, function(){
-        $scope.changeState();
+        $rootScope.changeState();
       });
     }])
 
@@ -64,7 +72,11 @@ angular.module('choko.controllers', [])
       }
 
       if ($scope.panel.bare) {
-        $scope.template = $scope.panel.template || 'templates/panel-content.html';
+        if ($scope.panel.html === false) {
+          $scope.template = $scope.panel.template || 'templates/panel-content-no-html.html';
+        } else {
+          $scope.template = $scope.panel.template || 'templates/panel-content.html';
+        }
       }
       else {
         $scope.template = 'templates/panel.html';
@@ -153,6 +165,7 @@ angular.module('choko.controllers', [])
 
   .controller('ReferenceElementController', ['$scope', 'Choko',
     function ($scope, Choko) {
+
       var query = {
         type: $scope.element.reference.type
       };
@@ -320,33 +333,41 @@ angular.module('choko.controllers', [])
       };
     }])
 
-  .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Params',
-    function ($scope, $location, $http, Choko, Params) {
+  .controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params',
+    function ($scope, $location, $http, Choko, Restangular, Params) {
 
+      // Prevente creation of service if no itemType set.
+      if ($scope.view.itemType) {
+        // Create a new Service for Itemtype.
+        var itemTypeREST = Restangular.service($scope.view.itemType);
+      }
       // Parse parameters when needed.
       if (typeof $scope.view.itemKey !== 'undefined') {
         $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);
       }
 
       // Parse other params.
-      Object.keys($scope.view.query || {}).forEach(function (param) {
-        $scope.view.query[param] = Params.parse($scope.view.query[param], $scope);
+      Object.keys($scope.view.params || {}).forEach(function (param) {
+        $scope.view.params[param] = Params.parse($scope.view.params[param], $scope);
       });
 
       // Handle 'list' type views.
       if ($scope.view.type === 'list' && $scope.view.itemType) {
-        var query = {
-          type: $scope.view.itemType
-        };
+        var query = {};
 
         if ($scope.view.query) {
           angular.extend(query, $scope.view.query);
         }
 
+        angular.extend(query, $scope.view.params);
+
         $scope.items = {};
 
-        Choko.get(query, function(response) {
+        itemTypeREST.getList(query).then(function(response) {
           $scope.items = response;
+          $scope.items.$empty = Object.keys($scope.items).filter(function (key) {
+            return key.indexOf('$') != 0;
+          }).length ? false : true;
         });
 
         if (!$scope.view.template && $scope.view.listStyle) {
@@ -368,11 +389,11 @@ angular.module('choko.controllers', [])
       if ($scope.view.type === 'item' && $scope.view.itemType) {
         $scope.data = {};
         $scope.view.title = '';
-        Choko.get({type: $scope.view.itemType, key: $scope.view.itemKey}, function(response) {
+
+        itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
           $scope.data = response;
           $scope.view.title = response.title;
-        },
-        function(response) {
+        }, function(response) {
           // Error.
           if ($scope.page) {
             // If it's a page, show error, otherwise fail silently.
@@ -386,31 +407,44 @@ angular.module('choko.controllers', [])
       // Handle 'form' type views.
       if ($scope.view.type === 'form' && $scope.view.formName) {
         $scope.data = {};
+        var typeForm = 'post';
 
         if ($scope.view.itemType && $scope.view.itemKey) {
-          Choko.get({type: $scope.view.itemType, key: $scope.view.itemKey}, function(response) {
+          itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
             $scope.data = response;
+            typeForm = 'put'
           });
         }
 
         $scope.submit = function(url, redirect) {
-          // Add itemKey to the URL if any.
-          if ($scope.view.itemKey) {
-            url += '/' + $scope.view.itemKey;
+
+          var formREST = null;
+
+          // Add params to data if any.
+          Object.keys($scope.view.params || {}).forEach(function (param) {
+            $scope.data[param] = $scope.data[param] || $scope.view.params[param];
+          });
+
+          if(!itemTypeREST || url) {
+            formREST = Restangular.oneUrl('url', url).post('', $scope.data);
+          } else {
+            if (typeForm == 'post') {
+              formREST = itemTypeREST.post($scope.data);
+            } else {
+              formREST = $scope.data.customPUT($scope.data, $scope.view.itemKey);
+            }
           }
 
-          $http.post(url, $scope.data)
-            .success(function(data, status, headers, config) {
-              $scope.data = data;
-              delete $scope.errors;
-              if (redirect) {
-                $location.path(redirect);
-              }
-            })
-            .error(function(data, status, headers, config) {
-              $scope.status = status;
-              $scope.errors = data.data;
-            });
+          formREST.then(function(response) {
+            $scope.data = response;
+            delete $scope.errors;
+            if (redirect) {
+              $location.path(redirect);
+            }
+          }, function(response) {
+            $scope.errors = response.data.data;
+            $scope.status = response.status;
+          });
         };
 
         Choko.get({type: 'form', key: $scope.view.formName}, function(response) {
@@ -486,4 +520,4 @@ angular.module('choko.controllers', [])
           ['table', ['table']]
         ]
       };
-    }])
+    }]);

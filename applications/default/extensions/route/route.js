@@ -18,16 +18,13 @@ route.init = function(application, callback) {
     self.processRoutes(routes);
     application.routes = routes;
 
-      // The last middleware is the one that catches 404 errors.
-      self.application.application.use(function(req, res, next){
-        RouteController.notFound.call(self, req, res);
-      });
-
-      callback();
+    // The last middleware is the one that catches 404 errors.
+    self.application.application.use(function(req, res, next){
+      RouteController.notFound.call(self, req, res);
     });
-
-    callback();
   });
+
+  callback();
 };
 
 /**

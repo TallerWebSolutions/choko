@@ -34,6 +34,9 @@ rest.route = function(routes, callback) {
     if (!type.path) {
       type.path = '/' + typeName;
     }
+    
+    // Added default name
+    type.name = typeName;
 
     // Initialize access rules.
     type.access = type.access || {};

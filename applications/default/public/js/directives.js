@@ -14,7 +14,8 @@ angular.module('choko.directives', [])
       scope: true,
       compile: function(element, attrs) {
         return function(scope, element, attrs) {
-          scope.element.template = scope.element.template || 'templates/' + scope.element.type + '.html';
+          var templateUrl = attrs.subForm ? 'templates/subform/' : 'templates/';
+          scope.element.template = scope.element.template || templateUrl + scope.element.type + '.html';
           $http({method: 'GET', url: scope.element.template, cache: true}).then(function(result) {
             var template = angular.element($compile(result.data)(scope));
             element.replaceWith(template);

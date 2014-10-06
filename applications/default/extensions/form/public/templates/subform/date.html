@@ -1,0 +1,5 @@
+<div ng-controller="ElementController" class="form-group">
+  <label ng-if="element.title" for="element-{{form.name}}-{{subform.name}}-{{element.name}}">{{element.title}}</label>
+  <input ng-model="data[subform.name][element.name]" ng-required="element.required" type="date" class="form-control" id="element-{{form.name}}-{{subform.name}}-{{element.name}}" placeholder="{{element.placeholder}}">
+  <p ng-if="element.description" class="help-block">{{element.description}}</p>
+</div>

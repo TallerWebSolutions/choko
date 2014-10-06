@@ -8,12 +8,8 @@ var context = module.exports;
  * The init() hook.
  */
 context.init = function(application, callback) {
-  // Load all contexts.
-  var Context = this.application.type('context');
-  Context.list({}, function(err, contexts) {
-    application.application.use(contextMiddleware(application));
-    callback();
-  });
+  application.application.use(contextMiddleware(application));
+  callback();
 };
 
 /**
@@ -35,6 +31,7 @@ context.permission = function(permissions, callback) {
  */
 context.type = function(types, callback) {
   var newTypes = {};
+  var application = this.application;
 
   newTypes['context'] = {
     title: 'Context',
@@ -43,10 +40,12 @@ context.type = function(types, callback) {
       name: {
         title: 'Name',
         type: 'text',
+        required: true
       },
       title: {
         title: 'Title',
         type: 'text',
+        required: true
       },
       conditions: {
         title: 'Conditions',
@@ -82,9 +81,8 @@ context.type = function(types, callback) {
       'delete': 'manage-contexts'
     },
     methods: {
+      // @todo: move this to an extension method.
       execute: function(request, response, callback) {
-        var self = this;
-
         // Initialize conditions.
         this.conditions = this.conditions || {};
 
@@ -93,27 +91,30 @@ context.type = function(types, callback) {
         // Call callback bellow on the first conditionType that pass, if
         // matchAll is enabled all conditions must pass.
         var method = this.matchAll ? 'filter' : 'detect';
+        var context = this;
         async[method](conditionTypeNames, function(conditionTypeName, next) {
-          self.application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
-            conditionType.check(request, self.conditions[conditionTypeName], function(match) {
+          application.pick('contextConditionType', conditionTypeName, function(error, conditionType) {
+            conditionType.check(request, context.conditions[conditionTypeName], function(match) {
               next(match);
             });
           });
-        }, function(result) {
+        },
+        function(result) {
           // If none matches or 'matchAll' is enabled and not all conditions
           // matches, return false.
-          if (!result || (self.matchAll && result.length != conditionTypeNames.length)) {
+          if (!result || (context.matchAll && result.length != conditionTypeNames.length)) {
             return callback(false);
           }
 
-          self.reactions = self.reactions || {};
-          async.each(Object.keys(self.reactions), function(reactionTypeName, next) {
-            self.application.load('contextReactionType', reactionTypeName, function(err, reactionType) {
-              reactionType.react(request, response, self.reactions[reactionTypeName], function(err) {
-                next(err);
+          context.reactions = context.reactions || {};
+          async.each(Object.keys(context.reactions), function(reactionTypeName, next) {
+            application.pick('contextReactionType', reactionTypeName, function(error, reactionType) {
+              reactionType.react(request, response, context.reactions[reactionTypeName], function(error) {
+                next(error);
               });
             });
-          }, function() {
+          },
+          function() {
             callback(true);
           });
         });
@@ -242,7 +243,7 @@ context.contextConditionType = function(conditionTypes, callback) {
     check: function(request, conditions, callback) {
       var conditionTypeNames = Object.keys(conditions);
       async.filter(conditionNames, function(conditionTypeName, next) {
-        application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
+        application.pick('contextConditionType', conditionTypeName, function(err, conditionType) {
           conditionType.check(request, conditions[conditionTypeName], function(match) {
             next(match);
           });
@@ -270,7 +271,7 @@ context.contextConditionType = function(conditionTypes, callback) {
     },
     check: function(request, conditions, callback) {
       async.detect(Object.keys(conditions), function(conditionTypeName, next) {
-        application.load('contextConditionType', conditionTypeName, function(err, conditionType) {
+        application.pick('contextConditionType', conditionTypeName, function(err, conditionType) {
           conditionType.check(request, conditions[conditionTypeName], function(match) {
             next(match);
           });

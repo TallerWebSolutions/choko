@@ -6,27 +6,6 @@ var utils = require('prana').utils;
 var field = module.exports = {};
 
 /**
- * The type() hook.
- */
-field.type = function(types, callback) {
-  var newTypes = {};
-
-  newTypes['field'] = {
-    title: 'Field',
-    description: 'Fields add schema to types and provide validation and output sanitizing.',
-    access: {
-      'list': true,
-      'load': true,
-      'add': false,
-      'edit': false,
-      'delete': false
-    },
-  };
-
-  callback(null, newTypes);
-};
-
-/**
  * The field() hook.
  */
 field.field = function(fields, callback) {
@@ -35,7 +14,11 @@ field.field = function(fields, callback) {
   newFields['id'] = {
     title: 'Identifier',
     description: 'A Universally unique identifier.',
-    preSave: function(settings, item, next) {
+    schema: {
+      type: 'string',
+      uuid: true
+    },
+    beforeCreate: function(settings, item, next) {
       if (!(settings.name in item)) {
         // Generate an UUID v4.
         item[settings.name] = uuid.v4();
@@ -45,6 +28,20 @@ field.field = function(fields, callback) {
   };
   newFields['text'] = {
     title: 'Text',
+    schema: function(settings) {
+      var schema = {
+        type: (settings.maxLength > 256) ? 'text' : 'string'
+      };
+
+      // Add max/min properties if set.
+      ['maxLength', 'minLength'].map(function(what) {
+        if (what in settings) {
+          schema[what] = settings[what];
+        }
+      });
+
+      return schema;
+    },
     element: 'text',
     validate: function(settings, item, next) {
       // Default minLenght to 1.
@@ -58,6 +55,20 @@ field.field = function(fields, callback) {
   };
   newFields['number'] = {
     title: 'Number',
+    schema: function(settings) {
+      var schema = {
+        type: (settings.decimals && settings.decimals > 0) ? 'float' : 'integer'
+      };
+
+      // Add max/min properties if set.
+      ['max', 'min'].map(function(what) {
+        if (what in settings) {
+          schema[what] = settings[what];
+        }
+      });
+
+      return schema;
+    },
     element: 'number',
     validate: function(settings, item, next) {
       next(null, validator.isNumeric(item[settings.name].toString()) || 'Invalid number.');
@@ -65,13 +76,24 @@ field.field = function(fields, callback) {
   };
   newFields['date'] = {
     title: 'Date',
+    schema: 'date',
     element: 'date',
     validate: function(settings, item, next) {
       next(null, validator.isDate(item[settings.name].toString()) || 'Invalid date.');
     }
   };
+  newFields['boolean'] = {
+    title: 'Boolean',
+    description: 'True or false, yes or no, on or off.',
+    schema: 'boolean',
+    element: 'checkbox'
+  };
   newFields['email'] = {
     title: 'Email',
+    schema: {
+      type: 'string',
+      email: true
+    },
     element: 'email',
     validate: function(settings, item, next) {
       // Email validator oddly returns the email itself, so need to convert to
@@ -81,6 +103,10 @@ field.field = function(fields, callback) {
   };
   newFields['url'] = {
     title: 'URL',
+    schema: {
+      type: 'string',
+      url: true
+    },
     element: 'url',
     validate: function(settings, item, next) {
       next(null, validator.isUrl(item[settings.name].toString()) || 'Invalid URL.');
@@ -88,6 +114,9 @@ field.field = function(fields, callback) {
   };
   newFields['telephone'] = {
     title: 'Telephone',
+    schema: {
+      type: 'string'
+    },
     element: 'tel'
   };
   newFields['password'] = {
@@ -109,24 +138,22 @@ field.field = function(fields, callback) {
 field.fieldCallback = function(hook) {
   return function(type, data, callback) {
     var application = this.application;
-
-    if (type.settings.fields) {
+    var type = application.types[type]
+    if (type.fields) {
       // Validate type fields.
-      async.each(Object.keys(type.settings.fields), function(fieldName, next) {
-        var fieldSettings = type.settings.fields[fieldName];
+      async.each(Object.keys(type.fields), function(fieldName, next) {
+        var fieldSettings = type.fields[fieldName];
 
         // Add fieldName to fieldSettings.
         fieldSettings.name = fieldName;
 
-        var Field = application.type('field');
-        Field.load(fieldSettings.type, function(error, field) {
+        application.pick('field', fieldSettings.type, function(error, field) {
           if (error) {
             // Application error.
             return next(error);
           }
           if (!field || !(hook in field)) {
-            // Field is of an unrecognized type or there's not a preSave()
-            // callback.
+            // Field is of an unrecognized type or there's not a callback.
             return next();
           }
 
@@ -157,11 +184,11 @@ field.fieldCallback = function(hook) {
 /**
  * Create hook implementations for all type operations to call field hooks.
  */
-['load', 'list', 'save', 'delete'].forEach(function(operation) {
+['create', 'update', 'validate', 'destroy'].forEach(function(operation) {
   var operationCapitalized = utils.capitalizeFirstLetter(operation);
 
   // Add pre operation hooks that call callbacks on fields.
-  ['pre', 'post'].forEach(function(kind) {
+  ['before', 'after'].forEach(function(kind) {
     var hook = kind + operationCapitalized;
     field[hook] = field.fieldCallback(hook);
   });

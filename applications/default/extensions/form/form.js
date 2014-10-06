@@ -26,6 +26,18 @@ form.type = function(types, callback) {
   newTypes['form'] = {
     title: 'Form',
     description: 'Structures that can be rendered as forms.',
+    fields: {
+      name: {
+        title: 'Name',
+        type: 'text',
+        required: true
+      },
+      title: {
+        title: 'Title',
+        type: 'text',
+        required: true
+      }
+    },
     access: {
       // @todo: 'list' and 'load' should take into account form permissions.
       'list': true,
@@ -50,10 +62,11 @@ form.form = function(forms, callback) {
   // the ones that have the 'form' property set to false, the ones that have
   // no fields and the ones that are polymorphic.
   async.each(Object.keys(self.application.types), function(typeName, next) {
-    var typeSettings = self.application.types[typeName].type.settings;
-    if (typeName == 'type' || typeName == 'extension' || !typeSettings.fields || typeSettings.polymorphic) {
+    var typeSettings = self.application.types[typeName];
+    if (!typeSettings.fields || typeSettings.polymorphic) {
       return next();
     }
+
     var form = newForms['type-' + typeName] = {
       title: typeSettings.formTitle || typeSettings.title,
       description: 'Form for the ' + typeSettings.title + ' type.',
@@ -97,13 +110,13 @@ form.form = function(forms, callback) {
 
         // Check if referenced type is polymorphic, if so, we need to send the
         // referenced types.
-        var referencedType = self.application.type(fieldSettings.reference.type);
-        if (referencedType && referencedType.type.settings.polymorphic) {
+        var referencedType = self.application.types[fieldSettings.reference.type];
+        if (referencedType && referencedType.polymorphic) {
           element.reference.subtypes = Object.keys(referencedType.subtypes).map(function(subtype) {
             return {
               name: subtype + utils.capitalizeFirstLetter(fieldSettings.reference.type),
               shortName: subtype,
-              title: referencedType.subtypes[subtype].type.settings.title
+              title: referencedType.subtypes[subtype].title
             };
           });
         }

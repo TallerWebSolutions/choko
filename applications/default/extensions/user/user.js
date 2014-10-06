@@ -94,6 +94,7 @@ user.permission = function(permissions, callback) {
  */
 user.type = function(types, callback) {
   var application = this.application;
+  var self = this;
   var newTypes = {};
 
   newTypes['user'] = {
@@ -115,11 +116,13 @@ user.type = function(types, callback) {
       password: {
         title: 'Password',
         type: 'password',
+        maxLength: 1024,
         required: true
       },
       salt: {
         title: 'Salt',
         type: 'text',
+        maxLength: 512,
         internal: true
       },
       roles: {
@@ -155,6 +158,9 @@ user.type = function(types, callback) {
           weight: 5
         }]
       }
+    },
+    beforeCreate: function(settings, data, callback) {
+      self.normalizeUserData(data, callback);
     },
     statics: {
       login: function(data, callback) {
@@ -268,14 +274,9 @@ user.type = function(types, callback) {
 };
 
 /**
- * The preSave() hook.
+ * Normalize user data. Hash password
  */
-user.preSave = function(type, data, callback) {
-  if (type.name != 'user') {
-    // Return early on types that are not the user type.
-    return callback(null, data);
-  }
-
+user.normalizeUserData = function(data, callback) {
   var User = this.application.type('user');
 
   // Generate a salt and hash the password.
@@ -313,7 +314,6 @@ user.route = function(routes, callback) {
       var data = request.body;
 
       var User = application.type('user');
-
       User.load(data.username, function(error, account) {
         if (error) {
           return callback(error);
@@ -329,8 +329,7 @@ user.route = function(routes, callback) {
         data.roles = [];
 
         // Create new user resource and save it.
-        var newAccount = new User(data);
-        newAccount.validateAndSave(function(error, newAccount, errors) {
+        var newAccount = User.create(data).exec(function(error, newAccount, errors) {
           if (error) {
             return callback(error);
           }
@@ -529,7 +528,9 @@ user.access = function(request, permission, callback) {
       next(!error && role && role.permissions.indexOf(permission) !== -1);
     });
   }, function(result) {
-    // @todo Add cache. Sort user roles, glue them together and use as cache id.
+    // @todo: Cache access check by role combination. Sort user roles, glue them
+    // together and use as cache id.
+
     // async.detect() returns roleName or undefined when nothing was detected,
     // so we need to convert it to boolean in some way.
     callback(null, result !== undefined);

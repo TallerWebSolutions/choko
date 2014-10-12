@@ -24,24 +24,10 @@ angular.module('choko')
       priority: 100,
       compile: function(element, attrs) {
         return function(scope, element, attrs) {
-
-          // Request the template content.
-          var loadTemplate = $http({
-            method: 'GET',
-            // If the directive is an element, "src" should be available.
-            url: attrs.ckReplace || attrs.src,
-            cache: true
-          });
-
-          // When ready, compile the retrieved template.
-          loadTemplate.then(function(result) {
-
-            // Compile the returned template.
-            var compiled = $compile(result.data)(scope);
-
-            // Replace old element with compiled one.
-            element.replaceWith(angular.element(compiled));
-
+          scope.element.template = scope.element.template || '/templates/' + scope.element.type + '.html';
+          $http({method: 'GET', url: scope.element.template, cache: true}).then(function(result) {
+            var template = angular.element($compile(result.data)(scope));
+            element.replaceWith(template);
           });
         };
       }

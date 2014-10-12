@@ -73,13 +73,13 @@ angular.module('choko')
 
       if ($scope.panel.bare) {
         if ($scope.panel.html === false) {
-          $scope.template = $scope.panel.template || 'templates/panel-content-no-html.html';
+          $scope.template = $scope.panel.template || '/templates/panel-content-no-html.html';
         } else {
-          $scope.template = $scope.panel.template || 'templates/panel-content.html';
+          $scope.template = $scope.panel.template || '/templates/panel-content.html';
         }
       }
       else {
-        $scope.template = 'templates/panel.html';
+        $scope.template = '/templates/panel.html';
       }
     }])
 
@@ -105,7 +105,7 @@ angular.module('choko')
       $scope.name = $scope.row.name;
 
       $scope.getTemplate = function() {
-        return $scope.template || 'templates/row.html';
+        return $scope.template || '/templates/row.html';
       }
     }])
 
@@ -114,7 +114,7 @@ angular.module('choko')
       $scope.name = $scope.column.name;
 
       $scope.getTemplate = function() {
-        return $scope.template || 'templates/column.html';
+        return $scope.template || '/templates/column.html';
       };
     }])
 
@@ -377,10 +377,12 @@ angular.module('choko')
         if (!$scope.view.itemTemplate && $scope.view.itemDisplay) {
           Choko.get({type: 'display', key: $scope.view.itemDisplay}, function(display) {
             $scope.display = display;
-            Choko.get({type: 'displayLayout', key: display.layout}, function(layout) {
-              $scope.layout = layout;
-              $scope.view.itemTemplate = '/templates/display-layout.html';
-            });
+            if (display.layout) {
+              Choko.get({type: 'displayLayout', key: display.layout}, function(layout) {
+                $scope.layout = layout;
+                $scope.view.itemTemplate = '/templates/display-layout.html';
+              });
+            }
           });
         }
       }
@@ -460,19 +462,19 @@ angular.module('choko')
           $scope.form.redirect = $scope.view.redirect || $scope.form.redirect || null;
 
           $scope.view.template = $scope.view.template || $scope.form.template;
-          $scope.view.template = $scope.view.template || 'templates/form.html';
+          $scope.view.template = $scope.view.template || '/templates/form.html';
         });
       }
     }])
 
   .controller('ElementController', ['$scope',
     function ($scope) {
-      $scope.element.template = $scope.element.template || 'templates/' + $scope.element.type + '.html';
+      $scope.element.template = $scope.element.template || '/templates/' + $scope.element.type + '.html';
     }])
 
   .controller('FileElementController', ['$scope', '$upload',
     function ($scope, $upload) {
-      $scope.element.template = $scope.element.template || 'templates/' + $scope.element.type + '.html';
+      $scope.element.template = $scope.element.template || '/templates/' + $scope.element.type + '.html';
       $scope.progress = 0;
 
       // Initialize files container.
@@ -498,7 +500,7 @@ angular.module('choko')
 
   .controller('SubElementController', ['$scope',
     function ($scope) {
-      $scope.subElement.template = $scope.subElement.template || 'templates/' + $scope.subElement.type + '.html';
+      $scope.subElement.template = $scope.subElement.template || '/templates/' + $scope.subElement.type + '.html';
     }])
 
   .controller('ButtonController', ['$scope',

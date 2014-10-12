@@ -69,6 +69,20 @@ navigation.type = function(types, callback) {
       'edit': 'manage-navigations',
       'delete': 'manage-navigations'
     },
+    displays: {
+      'list-group-item': {
+        'heading': [{
+          fieldName: 'title',
+          format: 'title',
+          weight: 0
+        }],
+        'text': [{
+          fieldName: 'description',
+          format: 'paragraph',
+          weight: 5
+        }]
+      }
+    },
     // Add callbacks to invalidate panel cache on navigation operations.
     afterCreate: clearPanelCache,
     afterUpdate: clearPanelCache,
@@ -174,7 +188,7 @@ navigation.panel = function(panels, callback) {
         classes: nav.classes,
         itemType: 'navigation',
         itemKey: navigationName,
-        template: nav.template || 'templates/navigation.html'
+        template: nav.template || '/templates/navigation.html'
       };
 
       next();

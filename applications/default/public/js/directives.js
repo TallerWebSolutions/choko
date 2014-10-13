@@ -83,7 +83,7 @@ angular.module('choko')
 
           // Allow for custom templates but fallback to default one based
           // on element type.
-          scope.element.template = scope.element.template || 'templates/' + scope.element.type + '.html';
+          scope.element.template = scope.element.template || '/templates/' + scope.element.type + '.html';
 
           // Append the ck-replace directive.
           element.attr('ck-replace', scope.element.template);

@@ -143,6 +143,7 @@ angular.module('choko')
         var typeForm = 'post';
 
         if ($scope.view.itemType && $scope.view.itemKey) {
+          // Load item for editing.
           itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
             $scope.data = response;
             typeForm = 'put'

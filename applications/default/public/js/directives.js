@@ -97,7 +97,8 @@ angular.module('choko')
   // Handles button or button groups for navigation bars.
   // @todo This directive is specifically used by the navigation extension.
   //       Therefore it should be moved to this extension's directory.
-  .directive('ckButton', ['ckReplaceAndRecompile', function(ckReplaceAndRecompile) {
+
+  .directive('ckButtonOld', ['ckReplaceAndRecompile', function(ckReplaceAndRecompile) {
     return {
       restrict: 'EA',
       scope: true,
@@ -127,4 +128,22 @@ angular.module('choko')
         };
       }
     };
-  }]);
+  }])
+
+.directive('ckButton', function($http, $compile) {
+    return {
+      restrict: 'E',
+      scope: true,
+      compile: function(element, attrs) {
+        return function(scope, element, attrs) {
+          var template = scope.item.items ? '/templates/btn-group-dropdown.html' : '/templates/btn-group-button.html';
+          scope.item.classes = scope.item.classes || ['btn-default'];
+
+          $http({method: 'GET', url: template, cache: true}).then(function(result) {
+            var template = angular.element($compile(result.data)(scope));
+            element.replaceWith(template);
+          });
+        };
+      }
+    };
+  });

@@ -73,6 +73,11 @@ rest.route = function(routes, callback) {
           });
         }
         if (request.method == 'POST') {
+          // Remove key property to prevent updating.
+          if (type.keyProperty in request.body) {
+            delete request.body[type.keyProperty];
+          }
+
           return typeModel.validateAndSave(request.body, validationResponseCallback(callback));
         }
         callback();
@@ -99,11 +104,22 @@ rest.route = function(routes, callback) {
           return typeModel.validateAndSave(request.body, validationResponseCallback(callback));
         }
         if (request.method == 'POST' || request.method == 'PATCH') {
-          return typeModel.load(request.params[paramName], function(err, item) {
+          return typeModel.load(request.params[paramName], function(error, item) {
+            if (error) {
+              return callback(error);
+            }
+
+            // Remove key property from incoming data to prevent updating the
+            // wrong item.
+            if (type.keyProperty in request.body) {
+              delete request.body[type.keyProperty];
+            }
+
             if (item) {
               utils.extend(item, request.body);
               request.body = item;
             }
+
             typeModel.validateAndSave(request.body, validationResponseCallback(callback));
           });
         }

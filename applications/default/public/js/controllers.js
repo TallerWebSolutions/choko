@@ -163,13 +163,13 @@ angular.module('choko')
             delete $scope.data.originalElement;
           }
 
-          if(!itemTypeREST || url) {
+          if(!itemTypeREST && url) {
             formREST = Restangular.oneUrl('url', url).post('', $scope.data);
           } else {
             if (typeForm == 'post') {
               formREST = itemTypeREST.post($scope.data);
             } else {
-              formREST = $scope.data.customPUT($scope.data, $scope.view.itemKey);
+              formREST = $scope.data.put();
             }
           }
 

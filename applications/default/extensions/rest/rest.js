@@ -101,7 +101,14 @@ rest.route = function(routes, callback) {
           return typeModel.load(request.params[paramName], callback);
         }
         if (request.method == 'PUT') {
-          return typeModel.validateAndSave(request.body, validationResponseCallback(callback));
+          var criteria = {};
+          criteria[type.keyProperty] = request.params[paramName];
+          return typeModel.update(criteria, request.body, function(error, data) {
+            if(error) {
+              return callback(error)
+            }
+            callback(null, data[0]);
+          });
         }
         if (request.method == 'POST' || request.method == 'PATCH') {
           return typeModel.load(request.params[paramName], function(error, item) {

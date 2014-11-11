@@ -153,11 +153,8 @@ angular.module('choko')
       };
     }
     else {
-      if ($scope.data[$scope.element.name]) {
-        $scope.data = $scope.data[$scope.element.name];
-      }
-      else {
-        $scope.data = $scope.data[$scope.element.name] = {};
+      if (!$scope.data[$scope.element.name]) {        
+        $scope.data[$scope.element.name] = {};
       }
     }
 
@@ -165,11 +162,12 @@ angular.module('choko')
       // Start by destroying the subform and its data.
       // @todo: eventually we may want to add a confirmation, if form is "dirty".
       delete $scope.element.subform;
-      $scope.data = {};
+      $scope.subform = {};
 
       // Get the new subform from the REST server.
       Choko.get({type: 'form', key: 'type-' + type}, function(response) {
         var subform = $scope.element.subform = response;
+        $scope.subform.name = subform.typeName;
 
         // We are editing a item, store data.
         if (data) {

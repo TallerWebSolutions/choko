@@ -1,11 +1,11 @@
+'use strict';
+
 /**
  * @file Main AngularJS module for the choko application.
  */
 
-'use strict';
-
 // Define core choko dependencies.
-var dependencies = [
+var dependencies = [  
   'ngRoute',
   'ngResource',
   'ngSanitize',
@@ -24,7 +24,10 @@ angular.module('choko', dependencies)
 
   // Location/routing configuration.
   .config(['$locationProvider', function($locationProvider) {
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode({
+      enabled: true,
+      requireBase: false
+    });
   }])
   .config(['RestangularProvider', function(RestangularProvider) {
     RestangularProvider.setBaseUrl('/rest');
@@ -45,6 +48,10 @@ angular.module('choko', dependencies)
           temp.push(data.data[name]);
         });
         extractedData = temp;
+      }
+      else if (operation === 'put') {
+        extractedData = data.data;
+        extractedData.updated = true;
       }
       else {
         extractedData = data.data;

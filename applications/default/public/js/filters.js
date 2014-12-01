@@ -1,10 +1,16 @@
+'use strict';
+
 /**
  * @file Choko core filters.
  */
 
-'use strict';
-
 angular.module('choko')
+
+  .filter('interpolate', ['version', function(version) {
+    return function(text) {
+      return String(text).replace(/\%VERSION\%/mg, version);
+    }
+  }])
 
   // Filter to get an array of keys for an object.
   .filter('keys', function() {

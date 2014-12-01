@@ -1,5 +1,6 @@
 <div ck-element class="form-group">
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
-  <input ng-model="data[element.name]" ng-required="element.required" type="text" class="form-control" id="{{element.id}}" placeholder="{{element.placeholder}}">
+  <input ng-if="!element.isSubform" ng-model="data[element.name]" ng-required="element.required" type="text" class="form-control" id="{{element.id}}" placeholder="{{element.placeholder}}">
+  <input ng-if="element.isSubform" ng-model="data[subform.name][element.name]" ng-required="element.required" type="text" class="form-control" id="{{element.id}}" placeholder="{{element.placeholder}}">
   <p ng-if="element.description" class="help-block">{{element.description}}</p>
 </div>

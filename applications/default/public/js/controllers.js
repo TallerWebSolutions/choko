@@ -1,10 +1,12 @@
+'use strict';
+
+
 /**
  * @file Choko core controllers.
  */
 
-'use strict';
-
 angular.module('choko')
+
   .controller('ApplicationController', ['$rootScope', '$location', '$http', 'applicationState',
     function ($rootScope, $location, $http, applicationState) {
       $rootScope.state = {};

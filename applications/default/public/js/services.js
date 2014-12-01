@@ -1,15 +1,14 @@
+'use strict';
+
 /**
  * @file Choko core services.
  */
-
-'use strict';
 
 // Append services to main choko module.
 angular.module('choko')
 
   // Choko main REST factory.
   .factory('Choko', ['$resource', function($resource) {
-
     var url = '/rest/:type/:key';
     var defaultParams = {
       type: '@type',

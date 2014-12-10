@@ -103,13 +103,13 @@ form.form = function(forms, callback) {
             element.type = field.element;
             break;
 
-          // If element is a object it's the element settings object.
+            // If element is a object it's the element settings object.
           case 'object':
             utils.extend(element, field.element);
             break;
 
-          // If element is a function run it to get the element settings
-          // object.
+            // If element is a function run it to get the element settings
+            // object.
           case 'function':
             utils.extend(element, field.element(fieldSettings));
             break;
@@ -164,8 +164,7 @@ form.form = function(forms, callback) {
           // Allow a string as element property value in this case this will be
           // the element type.
           element.type = fieldSettings.element;
-        }
-        else {
+        } else {
           // Merge in element settings.
           utils.extend(element, fieldSettings.element);
         }

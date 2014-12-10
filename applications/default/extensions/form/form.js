@@ -180,7 +180,9 @@ form.form = function(forms, callback) {
           name: 'submit',
           title: 'Save',
           type: 'submit',
-          url: '/rest/' + (typeSettings.mainTypeName || typeName),
+          // @note: Commented this line because we are using Restangular to build URLs
+          // in the frontend side.
+          // url: '/rest/' + (typeSettings.mainTypeName || typeName),
           classes: ['btn-primary'],
           weight: 50
         });

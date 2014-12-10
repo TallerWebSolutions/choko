@@ -1,5 +1,6 @@
 'use strict';
 
+
 /**
  * @file Choko core controllers.
  */
@@ -171,13 +172,15 @@ angular.module('choko')
           delete $scope.data.originalElement;
         }
 
-        if (!itemTypeREST && url) {
+        if (!itemTypeREST) {
           formREST = Restangular.oneUrl('url', url).post('', $scope.data);
         } else {
-          if (typeForm == 'post') {
-            formREST = itemTypeREST.post($scope.data);
+          if (url) {
+            formREST = Restangular.oneUrl('url', url).post('', $scope.data);
           } else {
-            formREST = $scope.data.put();
+            formREST = typeForm === 'post' ?
+              itemTypeREST.post($scope.data) :
+              $scope.data.put();
           }
         }
 

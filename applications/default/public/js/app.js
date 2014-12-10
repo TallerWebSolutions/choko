@@ -65,10 +65,15 @@ angular.module('choko', dependencies)
       RestangularProvider.setResponseExtractor(function(response) {
         var newResponse = response;
 
+        // Verify if the response is an Array object
         if (angular.isArray(response)) {
           angular.forEach(newResponse, function(value, key) {
             newResponse[key].originalElement = angular.copy(value);
           });
+
+        // Verify if the response is a String object
+        } else if (angular.isString(response)) {
+          newResponse = response;
         } else {
           newResponse.originalElement = angular.copy(response);
         }

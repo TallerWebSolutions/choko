@@ -68,20 +68,44 @@ file.field = function(fields, callback) {
   var newFields = {};
   var self = this;
 
+  function moveTemporaryFile(settings, fileId, file, next) {
+    fs.readFile(file.path, function(error, data) {
+      if (error) {
+        return next(error);
+      }
+
+      // Create a new filename based on file ID and file extension.
+      var fileName = fileId + path.extname(file.path);
+
+      // Create a path for file based on field name and the new filename.
+      var filePath = path.join(application.settings.applicationDir, 'public/files', settings.name, fileName);
+
+      self.createPathAndSave(filePath, data, function(error) {
+        if (error) {
+          return next(error);
+        }
+
+        file.path = path.join(settings.name, fileName);
+        file.temporary = false;
+        file.save(next);
+      });
+    });
+  }
+
+
   newFields['file'] = {
     title: 'File',
     schema: 'string',
     element: 'file',
     validate: function(settings, item, next) {
+
       var fileId = item[settings.name];
       application.load('file', fileId, function(error, file) {
         if (error) {
           return next(error);
         }
-        if (file && file.temporary) {
-          return next(null, true);
-        }
-        next(null, 'Invalid file identifier.');
+
+        return next(null, true);
       });
     },
     beforeCreate: function(settings, item, next) {
@@ -94,27 +118,25 @@ file.field = function(fields, callback) {
 
         // @todo: move the file without reading it to memory for performance and
         // to avoid memory leaks.
-        fs.readFile(file.path, function(error, data) {
-          if (error) {
-            return next(error);
-          }
+        moveTemporaryFile(settings, fileId, file, next);
+      });
+    },
+    beforeUpdate: function(settings, item, next) {
+      var fileId = item[settings.name];
 
-          // Create a new filename based on file ID and file extension.
-          var fileName = fileId + path.extname(file.path);
+      application.load('file', fileId, function(error, file) {
+        if (error) {
+          return next(error);
+        }
 
-          // Create a path for file based on field name and the new filename.
-          var filePath = path.join(application.settings.applicationDir, 'public/files', settings.name, fileName);
+        // Verify if a new file was loaded
+        if (!file.temporary) {
+          return next(null, true);
+        }
 
-          self.createPathAndSave(filePath, data, function(error) {
-            if (error) {
-              return next(error);
-            }
-
-            file.path = path.join(settings.name, fileName);
-            file.temporary = false;
-            file.save(next);
-          });
-        });
+        // @todo: move the file without reading it to memory for performance and
+        // to avoid memory leaks.
+        moveTemporaryFile(settings, fileId, file, next);
       });
     }
   };
@@ -136,22 +158,22 @@ file.route = function(routes, callback) {
 
       var File = application.type('file');
       File.validateAndSave({
-        filename: requestFile.originalname,
-        filetype: requestFile.mimetype,
-        size: parseInt(requestFile.size),
-        path: requestFile.path,
-        temporary: true
-      },
-      function(error, file) {
-        if (error) {
-          return callback(error);
-        }
+          filename: requestFile.originalname,
+          filetype: requestFile.mimetype,
+          size: parseInt(requestFile.size),
+          path: requestFile.path,
+          temporary: true
+        },
+        function(error, file) {
+          if (error) {
+            return callback(error);
+          }
 
-        // Pass only the id that's what we need for now.
-        callback(null, {
-          id: file.id
+          // Pass only the id that's what we need for now.
+          callback(null, {
+            id: file.id
+          });
         });
-      });
     }
   };
 
@@ -168,8 +190,7 @@ file.createPathAndSave = function(filePath, data, callback) {
     // a number suffix.
     if (exists) {
       fs.writeFile(filePath, data, callback);
-    }
-    else {
+    } else {
       utils.mkdir(dirName, function(error) {
         if (error) {
           return callback(error);

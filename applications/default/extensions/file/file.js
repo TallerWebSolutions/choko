@@ -92,17 +92,28 @@ file.field = function(fields, callback) {
     });
   }
 
-
   newFields['file'] = {
     title: 'File',
     schema: 'string',
     element: 'file',
     validate: function(settings, item, next) {
+      var fileId = item[settings.name]; // item[picture] -> 120
 
-      var fileId = item[settings.name];
+      if(!fileId && !settings.required) {
+        return next(null, true);
+      }
+
+      if (settings.required && !fileId) {
+        return next(null, settings.title + ' is required');
+      }
+
       application.load('file', fileId, function(error, file) {
         if (error) {
           return next(error);
+        }
+
+        if(!file) {
+          return next(null, 'The file don\'t exist');
         }
 
         return next(null, true);
@@ -110,6 +121,10 @@ file.field = function(fields, callback) {
     },
     beforeCreate: function(settings, item, next) {
       var fileId = item[settings.name];
+
+      if (!fileId) {
+        return next(null);
+      };
 
       application.load('file', fileId, function(error, file) {
         if (error) {
@@ -124,14 +139,18 @@ file.field = function(fields, callback) {
     beforeUpdate: function(settings, item, next) {
       var fileId = item[settings.name];
 
+      if (!fileId) {
+        return next(null);
+      };
+
       application.load('file', fileId, function(error, file) {
         if (error) {
           return next(error);
         }
 
-        // Verify if a new file was loaded
+        // Verify if update file
         if (!file.temporary) {
-          return next(null, true);
+          return next(null);
         }
 
         // @todo: move the file without reading it to memory for performance and

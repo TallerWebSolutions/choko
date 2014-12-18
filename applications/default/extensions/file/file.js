@@ -94,7 +94,23 @@ file.field = function(fields, callback) {
 
   newFields['file'] = {
     title: 'File',
-    schema: 'string',
+    schema: function(settings) {
+      var schema = {};
+
+      if (settings.multiple) {
+        // schema.collection = 'file';
+      }
+      else {
+        // schema.model = 'file';
+      }
+
+      if (settings.via) {
+        schema.type = 'file'
+        schema.via = 'id';
+      }
+
+      return schema;
+    },
     element: 'file',
     validate: function(settings, item, next) {
       var fileId = item[settings.name]; // item[picture] -> 120

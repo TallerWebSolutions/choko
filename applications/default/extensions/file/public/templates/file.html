@@ -1,5 +1,4 @@
 <div ck-file-element class="form-group">
-  <i>{{element}}</i>
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
 
   <input type="file" class="form-control" name="{{element.name}}" id="{{element.id}}" placeholder="{{element.placeholder}}" ng-if="!element.isSubform" ng-model="data[element.name]" ng-required="element.required" ng-file-select="onFileSelect($files)">

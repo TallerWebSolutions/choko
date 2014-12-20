@@ -28,7 +28,11 @@ angular.module('choko')
 
     // Initialize files container.
     // @todo support multiple files.
-    $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || null;
+    if (!$scope.subform) {
+      $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || null;
+    } else {
+      $scope.data[$scope.subform.name][$scope.element.name] = $scope.data[$scope.subform.name][$scope.element.name] || null;
+    };
 
     $scope.onFileSelect = function($files) {
       for (var i = 0; i < $files.length; i++) {
@@ -41,7 +45,11 @@ angular.module('choko')
           $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
         })
         .success(function(data, status, headers, config) {
-          $scope.data[$scope.element.name] = data.data.id;
+          if (!$scope.subform) {
+            $scope.data[$scope.element.name] = data.data.id;
+          } else{
+            $scope.data[$scope.subform.name][$scope.element.name] = data.data.id;
+          };
         });
       }
     };

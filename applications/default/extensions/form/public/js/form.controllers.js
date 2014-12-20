@@ -173,7 +173,7 @@ angular.module('choko')
       // Get the new subform from the REST server.
       Choko.get({type: 'form', key: 'type-' + type}, function(response) {
         var subform = $scope.element.subform = response;
-        $scope.subform.name = subform.typeName;
+        $scope.subform.name = $scope.element.name;
 
         // We are editing a item, store data.
         if (data) {

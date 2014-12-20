@@ -98,15 +98,10 @@ file.field = function(fields, callback) {
       var schema = {};
 
       if (settings.multiple) {
-        // schema.collection = 'file';
+        schema.collection = 'file';
       }
       else {
-        // schema.model = 'file';
-      }
-
-      if (settings.via) {
-        schema.type = 'file'
-        schema.via = 'id';
+        schema.model = 'File';
       }
 
       return schema;

@@ -172,21 +172,17 @@ angular.module('choko')
       if ($scope.view.itemType && $scope.view.itemKey) {
 
         // Load item data for editing.
-        itemREST = itemTypeREST.one($scope.view.itemKey).get();
-
-        itemREST.then(function(response) {
-          $scope.data = response;
-          typeForm = 'put'
-        });
+        itemTypeREST.one($scope.view.itemKey)
+          .get()
+          .then(function(response) {
+            $scope.data = response;
+            typeForm = 'put';
+            $scope.buildChokoForm();
+          });
       }
 
-      // Verify if the form is the type PUT to build the form after
-      // to load the data.
-      if(typeForm === 'put' && itemREST) {
-        itemREST.then(function() {
-          $scope.buildChokoForm();
-        });
-      } else {
+      // Verify if the form is the type PUT to build the form
+      if(!typeForm === 'put') {
         $scope.buildChokoForm();
       }
 

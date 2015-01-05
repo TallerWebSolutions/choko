@@ -28,10 +28,20 @@ angular.module('choko')
 
     // Initialize files container.
     // @todo support multiple files.
+
     if (!$scope.subform) {
-      $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || null;
+
+      var file = $scope.data[$scope.element.name] || null;
+      $scope.data[$scope.element.name] = file instanceof Object ?
+        $scope.data[$scope.element.name].id :
+        null;
+
     } else {
-      $scope.data[$scope.subform.name][$scope.element.name] = $scope.data[$scope.subform.name][$scope.element.name] || null;
+
+      var file = $scope.data[$scope.subform.name][$scope.element.name] || null;
+      $scope.data[$scope.subform.name][$scope.element.name] = file instanceof Object ?
+        file.id :
+        null;
     };
 
     $scope.onFileSelect = function($files) {

@@ -147,15 +147,47 @@ angular.module('choko')
 
     // Handle 'form' type views.
     if ($scope.view.type === 'form' && $scope.view.formName) {
-      $scope.data = {};
       var typeForm = 'post';
+      var itemREST = null;
+
+      $scope.data = {};
+      $scope.buildChokoForm = function () {
+        Choko.get({type: 'form', key: $scope.view.formName}, function(response) {
+          $scope.form = response;
+
+          if ($scope.form.mainTypeName) {
+            $scope.data.type = $scope.form.shortName;
+          }
+
+          // First we look for view (page/panel) redirect, then for form redirect.
+          // The submit button will first look for a property of its own and
+          // fallback to this.
+          $scope.form.redirect = $scope.view.redirect || $scope.form.redirect || null;
+
+          $scope.view.template = $scope.view.template || $scope.form.template;
+          $scope.view.template = $scope.view.template || '/templates/form.html';
+        });
+      };
 
       if ($scope.view.itemType && $scope.view.itemKey) {
-        // Load item for editing.
-        itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
+
+        // Load item data for editing.
+        itemREST = itemTypeREST.one($scope.view.itemKey).get();
+
+        itemREST.then(function(response) {
           $scope.data = response;
           typeForm = 'put'
         });
+      }
+
+      // Verify if the form is the type PUT to build the form after
+      // to load the data.
+      if(typeForm === 'put' && itemREST) {
+        itemREST.then(function() {
+          $scope.buildChokoForm();
+        });
+      } else {
+        $scope.buildChokoForm();
       }
 
       $scope.submit = function(url, redirect) {
@@ -195,25 +227,6 @@ angular.module('choko')
           $scope.status = response.status;
         });
       };
-
-      Choko.get({
-        type: 'form',
-        key: $scope.view.formName
-      }, function(response) {
-        $scope.form = response;
-
-        if ($scope.form.mainTypeName) {
-          $scope.data.type = $scope.form.shortName;
-        }
-
-        // First we look for view (page/panel) redirect, then for form redirect.
-        // The submit button will first look for a property of its own and
-        // fallback to this.
-        $scope.form.redirect = $scope.view.redirect || $scope.form.redirect || null;
-
-        $scope.view.template = $scope.view.template || $scope.form.template;
-        $scope.view.template = $scope.view.template || '/templates/form.html';
-      });
     }
   }
 ]);

@@ -69,6 +69,9 @@ file.field = function(fields, callback) {
   var self = this;
 
   function moveTemporaryFile(settings, fileId, file, next) {
+    // @todo: move the file without reading it to memory for performance and
+    // to avoid memory leaks.
+
     fs.readFile(file.path, function(error, data) {
       if (error) {
         return next(error);
@@ -90,7 +93,7 @@ file.field = function(fields, callback) {
         file.save(next);
       });
     });
-  }
+  };
 
   newFields['file'] = {
     title: 'File',
@@ -101,14 +104,14 @@ file.field = function(fields, callback) {
         schema.collection = 'file';
       }
       else {
-        schema.model = 'File';
+        schema.model = 'file';
       }
 
       return schema;
     },
     element: 'file',
     validate: function(settings, item, next) {
-      var fileId = item[settings.name]; // item[picture] -> 120
+      var fileId = item[settings.name];
 
       if(!fileId && !settings.required) {
         return next(null, true);
@@ -124,11 +127,15 @@ file.field = function(fields, callback) {
         }
 
         if(!file) {
-          return next(null, 'The file don\'t exist');
+          return next(null, "Error uploading the file");
         }
 
         return next(null, true);
       });
+    },
+    find: function(settings, query, next) {
+      query.populate(settings.name);
+      next();
     },
     beforeCreate: function(settings, item, next) {
       var fileId = item[settings.name];
@@ -142,8 +149,6 @@ file.field = function(fields, callback) {
           return next(error);
         }
 
-        // @todo: move the file without reading it to memory for performance and
-        // to avoid memory leaks.
         moveTemporaryFile(settings, fileId, file, next);
       });
     },
@@ -159,13 +164,11 @@ file.field = function(fields, callback) {
           return next(error);
         }
 
-        // Verify if update file
+        // Verify if the file was updated.
         if (!file.temporary) {
           return next(null);
         }
 
-        // @todo: move the file without reading it to memory for performance and
-        // to avoid memory leaks.
         moveTemporaryFile(settings, fileId, file, next);
       });
     }

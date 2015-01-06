@@ -170,13 +170,15 @@ angular.module('choko')
       };
 
       if ($scope.view.itemType && $scope.view.itemKey) {
-
+        
+        // Set type form to PUT.
+        typeForm = 'put';
+        
         // Load item data for editing.
         itemTypeREST.one($scope.view.itemKey)
           .get()
           .then(function(response) {
             $scope.data = response;
-            typeForm = 'put';
             $scope.buildChokoForm();
           });
       }

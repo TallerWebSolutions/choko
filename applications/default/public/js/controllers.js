@@ -97,8 +97,6 @@ angular.module('choko')
         angular.extend(query, $scope.view.query);
       }
 
-      angular.extend(query, $scope.view.params);
-
       $scope.items = {};
 
       itemTypeREST.getList(query).then(function(response) {

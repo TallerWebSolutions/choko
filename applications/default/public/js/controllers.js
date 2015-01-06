@@ -84,6 +84,11 @@ angular.module('choko')
       $scope.view.params[param] = Params.parse($scope.view.params[param], $scope);
     });
 
+    // Parse query params.
+    Object.keys($scope.view.query || {}).forEach(function (param) {
+      $scope.view.query[param] = Params.parse($scope.view.query[param], $scope);
+    });
+
     // Handle 'list' type views.
     if ($scope.view.type === 'list' && $scope.view.itemType) {
       var query = {};

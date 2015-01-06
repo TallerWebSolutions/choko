@@ -182,7 +182,7 @@ angular.module('choko')
       }
 
       // Verify if the form is the type PUT to build the form
-      if(!typeForm === 'put') {
+      if(typeForm != 'put') {
         $scope.buildChokoForm();
       }
 

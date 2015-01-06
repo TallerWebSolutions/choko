@@ -85,7 +85,7 @@ angular.module('choko')
     });
 
     // Parse query params.
-    Object.keys($scope.view.query || {}).forEach(function (param) {
+    Object.keys($scope.view.query || {}).forEach(function(param) {
       $scope.view.query[param] = Params.parse($scope.view.query[param], $scope);
     });
 
@@ -156,8 +156,11 @@ angular.module('choko')
       var itemREST = null;
 
       $scope.data = {};
-      $scope.buildChokoForm = function () {
-        Choko.get({type: 'form', key: $scope.view.formName}, function(response) {
+      $scope.buildChokoForm = function() {
+        Choko.get({
+          type: 'form',
+          key: $scope.view.formName
+        }, function(response) {
           $scope.form = response;
 
           if ($scope.form.mainTypeName) {
@@ -175,10 +178,10 @@ angular.module('choko')
       };
 
       if ($scope.view.itemType && $scope.view.itemKey) {
-        
+
         // Set type form to PUT.
         typeForm = 'put';
-        
+
         // Load item data for editing.
         itemTypeREST.one($scope.view.itemKey)
           .get()
@@ -189,7 +192,7 @@ angular.module('choko')
       }
 
       // Verify if the form is the type PUT to build the form
-      if(typeForm != 'put') {
+      if (typeForm != 'put') {
         $scope.buildChokoForm();
       }
 

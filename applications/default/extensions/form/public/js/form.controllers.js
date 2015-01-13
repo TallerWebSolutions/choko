@@ -13,8 +13,13 @@ angular.module('choko')
 
 .controller('ElementController', ['$scope',
   function ($scope) {
+
+    var elementName = !$scope.element.isSubform ?
+      $scope.element.name :
+      $scope.subform.name + '-' + $scope.element.name;
+
     $scope.element.template = $scope.element.template || '/templates/' + $scope.element.type + '.html';
-    $scope.element.id = $scope.element.id || 'element-' + $scope.form.name + '-' + $scope.element.name;
+    $scope.element.id = $scope.element.id || 'element-' + $scope.form.name + '-' + elementName;
   }])
 
 .controller('FileElementController', ['$scope', '$controller', '$upload',

@@ -86,6 +86,10 @@ user.init = function(application, callback) {
 user.permission = function(permissions, callback) {
   var newPermissions = {};
 
+  newPermissions['edit-own-account'] = {
+    title: 'Edit own account',
+    description: 'Allow users to load and edit their own user accounts.'
+  };
   newPermissions['manage-users'] = {
     title: 'Manage users',
     description: 'List, create and edit users and manage permissions.'
@@ -148,7 +152,18 @@ user.type = function(types, callback) {
     },
     access: {
       'list': 'manage-users',
-      'load': 'manage-users',
+      'load': function(request, callback) {
+        application.access(request, 'edit-own-account', function(error, allow) {
+          if (error) {
+            return callback(error);
+          }
+          if (!allow) {
+            return callback(null, false);
+          }
+          // Allow if user is the same as logged in user.
+          callback(null, request.params.user && request.params.user == request.user.username);
+        });
+      },
       'add': 'manage-users',
       'edit': 'manage-users',
       'delete': 'manage-users'
@@ -388,11 +403,9 @@ user.route = function(routes, callback) {
   newRoutes['/settings/edit-account-submit/:username'] = {
     access: 'edit-own-account',
     callback: function(request, response, callback) {
-      var user = request.user;
-
       // @todo: figure out how to prevent form controller from sending the
       // username.
-      if (user.username != request.params.username) {
+      if (request.user.username != request.params.username) {
         return callback(null, ['Invalid user.'], 400);
       }
 
@@ -400,12 +413,13 @@ user.route = function(routes, callback) {
 
       // Delete unwanted data that may lead to security holes.
       delete data.id;
+      delete data.username;
       delete data.password;
       delete data.salt;
       delete data.roles;
 
       var User = application.type('user');
-      User.load(user.username, function(error, account) {
+      User.load(request.user.username, function(error, account) {
         utils.extend(account, data);
         account.save(callback)
       });
@@ -632,6 +646,11 @@ user.access = function(request, permission, callback) {
     username: 'anonymous',
     roles: ['anonymous']
   };
+
+  // Permission can be a callback.
+  if (typeof permission === 'function') {
+    return permission.call(this, request, callback);
+  }
 
   var application = this.application;
   async.detect(account.roles, function(roleName, next) {

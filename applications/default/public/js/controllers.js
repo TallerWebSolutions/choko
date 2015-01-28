@@ -154,7 +154,7 @@ angular.module('choko')
       var itemREST = null;
 
       $scope.data = {};
-      $scope.buildChokoForm = function() {
+      $scope.buildForm = function() {
         Choko.get({
           type: 'form',
           key: $scope.view.formName
@@ -185,13 +185,13 @@ angular.module('choko')
           .get()
           .then(function(response) {
             $scope.data = response;
-            $scope.buildChokoForm();
+            $scope.buildForm();
           });
       }
 
       // Verify if the form is the type PUT to build the form
       if (typeForm != 'put') {
-        $scope.buildChokoForm();
+        $scope.buildForm();
       }
 
       $scope.submit = function(url, redirect) {
@@ -221,7 +221,9 @@ angular.module('choko')
         }
 
         formREST.then(function(response) {
+
           $scope.data = response;
+
           delete $scope.errors;
           if (redirect) {
             $location.path(redirect);

@@ -110,14 +110,13 @@ field.field = function(fields, callback) {
   newFields['email'] = {
     title: 'Email',
     schema: {
-      type: 'string',
-      email: true
+      type: 'string'
     },
     element: 'email',
     validate: function(settings, item, next) {
       // Email validator oddly returns the email itself, so need to convert to
       // boolean.
-      next(null, new Boolean(validator.isEmail(item[settings.name].toString())) || 'Invalid email.');
+      next(null, !!validator.isEmail(item[settings.name].toString()) || 'Invalid email.');
     }
   };
 

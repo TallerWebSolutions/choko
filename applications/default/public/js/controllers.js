@@ -98,8 +98,9 @@ angular.module('choko')
       }
 
       $scope.items = {};
+      $scope.listREST = itemTypeREST.getList(query);
 
-      itemTypeREST.getList(query).then(function(response) {
+      $scope.listREST.then(function(response) {
         $scope.items = response;
         $scope.items.$empty = Object.keys($scope.items).filter(function(key) {
           return key.indexOf('$') != 0;

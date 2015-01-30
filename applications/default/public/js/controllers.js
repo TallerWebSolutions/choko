@@ -97,10 +97,11 @@ angular.module('choko')
         angular.extend(query, $scope.view.query);
       }
 
-      $scope.items = {};
+      // Expose view list promise to scope
       $scope.listREST = itemTypeREST.getList(query);
+      $scope.items = {};
 
-      $scope.listREST.then(function(response) {
+      $scope.viewList.then(function(response) {
         $scope.items = response;
         $scope.items.$empty = Object.keys($scope.items).filter(function(key) {
           return key.indexOf('$') != 0;
@@ -132,10 +133,14 @@ angular.module('choko')
 
     // Handle 'item' type views.
     if ($scope.view.type === 'item' && $scope.view.itemType) {
+
       $scope.data = {};
       $scope.view.title = '';
 
-      itemTypeREST.one($scope.view.itemKey).get().then(function(response) {
+      // Expose view item promise to scope
+      $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get();
+
+      $scope.viewItem.then(function(response) {
         $scope.data = response;
         $scope.view.title = response.title;
       }, function(response) {
@@ -197,8 +202,6 @@ angular.module('choko')
 
       $scope.submit = function(url, redirect) {
 
-        var formREST = null;
-
         // Add params to data if any.
         Object.keys($scope.view.params || {}).forEach(function(param) {
           $scope.data[param] = $scope.data[param] || $scope.view.params[param];
@@ -210,22 +213,22 @@ angular.module('choko')
         }
 
         if (!itemTypeREST) {
-          formREST = Restangular.oneUrl('url', url).post('', $scope.data);
+          $scope.viewForm = Restangular.oneUrl('url', url).post('', $scope.data);
         } else {
           if (url) {
-            formREST = Restangular.oneUrl('url', url).post('', $scope.data);
+            $scope.viewForm = Restangular.oneUrl('url', url).post('', $scope.data);
           } else {
-            formREST = typeForm === 'post' ?
+            $scope.viewForm = typeForm === 'post' ?
               itemTypeREST.post($scope.data) :
               $scope.data.put();
           }
         }
 
-        formREST.then(function(response) {
-
+        $scope.viewForm.then(function(response) {
           $scope.data = response;
 
           delete $scope.errors;
+
           if (redirect) {
             $location.path(redirect);
           }

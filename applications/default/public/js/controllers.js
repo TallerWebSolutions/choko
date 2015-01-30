@@ -98,7 +98,7 @@ angular.module('choko')
       }
 
       // Expose view list promise to scope
-      $scope.listREST = itemTypeREST.getList(query);
+      $scope.viewList = itemTypeREST.getList(query);
       $scope.items = {};
 
       $scope.viewList.then(function(response) {

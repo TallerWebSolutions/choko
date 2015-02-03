@@ -1,0 +1,156 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node',
+1 verbose cli   '/usr/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'install',
+1 verbose cli   '-g',
+1 verbose cli   'bower-cli' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.35
+4 verbose node symlink /usr/bin/node
+5 verbose cache add [ 'install', null ]
+6 verbose cache add name=undefined spec="install" args=["install",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'install',
+7 verbose parsed url   path: 'install',
+7 verbose parsed url   href: 'install' }
+8 verbose cache add [ 'bower-cli', null ]
+9 verbose cache add name=undefined spec="bower-cli" args=["bower-cli",null]
+10 verbose parsed url { protocol: null,
+10 verbose parsed url   slashes: null,
+10 verbose parsed url   auth: null,
+10 verbose parsed url   host: null,
+10 verbose parsed url   port: null,
+10 verbose parsed url   hostname: null,
+10 verbose parsed url   hash: null,
+10 verbose parsed url   search: null,
+10 verbose parsed url   query: null,
+10 verbose parsed url   pathname: 'bower-cli',
+10 verbose parsed url   path: 'bower-cli',
+10 verbose parsed url   href: 'bower-cli' }
+11 silly lockFile 89fb511f-install install
+12 verbose lock install /home/ubuntu/.npm/89fb511f-install.lock
+13 silly lockFile b5fc92bc-bower-cli bower-cli
+14 verbose lock bower-cli /home/ubuntu/.npm/b5fc92bc-bower-cli.lock
+15 silly lockFile 89fb511f-install install
+16 silly lockFile 89fb511f-install install
+17 silly lockFile b5fc92bc-bower-cli bower-cli
+18 silly lockFile b5fc92bc-bower-cli bower-cli
+19 verbose addNamed [ 'install', '' ]
+20 verbose addNamed [ null, '*' ]
+21 silly lockFile cadb329f-install install@
+22 verbose lock install@ /home/ubuntu/.npm/cadb329f-install.lock
+23 verbose addNamed [ 'bower-cli', '' ]
+24 verbose addNamed [ null, '*' ]
+25 silly lockFile 8942fdc3-bower-cli bower-cli@
+26 verbose lock bower-cli@ /home/ubuntu/.npm/8942fdc3-bower-cli.lock
+27 silly addNameRange { name: 'install', range: '*', hasData: false }
+28 silly addNameRange { name: 'bower-cli', range: '*', hasData: false }
+29 verbose request where is /bower-cli
+30 verbose request registry https://registry.npmjs.org/
+31 verbose request id eef6a4e7e833df94
+32 verbose url raw /bower-cli
+33 verbose url resolving [ 'https://registry.npmjs.org/', './bower-cli' ]
+34 verbose url resolved https://registry.npmjs.org/bower-cli
+35 verbose request where is https://registry.npmjs.org/bower-cli
+36 info trying registry request attempt 1 at 03:56:09
+37 http GET https://registry.npmjs.org/bower-cli
+38 verbose request where is /install
+39 verbose request registry https://registry.npmjs.org/
+40 verbose url raw /install
+41 verbose url resolving [ 'https://registry.npmjs.org/', './install' ]
+42 verbose url resolved https://registry.npmjs.org/install
+43 verbose request where is https://registry.npmjs.org/install
+44 info trying registry request attempt 1 at 03:56:09
+45 verbose etag "7VKN4U3HY1B8HVTW072TK9NWS"
+46 http GET https://registry.npmjs.org/install
+47 http 404 https://registry.npmjs.org/bower-cli
+48 verbose headers { date: 'Mon, 26 Jan 2015 03:56:10 GMT',
+48 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+48 verbose headers   'content-type': 'application/json',
+48 verbose headers   'cache-control': 'max-age=0',
+48 verbose headers   'content-length': '52',
+48 verbose headers   'accept-ranges': 'bytes',
+48 verbose headers   via: '1.1 varnish',
+48 verbose headers   age: '0',
+48 verbose headers   'x-served-by': 'cache-jfk1024-JFK',
+48 verbose headers   'x-cache': 'MISS',
+48 verbose headers   'x-cache-hits': '0',
+48 verbose headers   'x-timer': 'S1422244570.204562,VS0,VE79',
+48 verbose headers   'keep-alive': 'timeout=10, max=50',
+48 verbose headers   connection: 'Keep-Alive' }
+49 silly registry.get cb [ 404,
+49 silly registry.get   { date: 'Mon, 26 Jan 2015 03:56:10 GMT',
+49 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+49 silly registry.get     'content-type': 'application/json',
+49 silly registry.get     'cache-control': 'max-age=0',
+49 silly registry.get     'content-length': '52',
+49 silly registry.get     'accept-ranges': 'bytes',
+49 silly registry.get     via: '1.1 varnish',
+49 silly registry.get     age: '0',
+49 silly registry.get     'x-served-by': 'cache-jfk1024-JFK',
+49 silly registry.get     'x-cache': 'MISS',
+49 silly registry.get     'x-cache-hits': '0',
+49 silly registry.get     'x-timer': 'S1422244570.204562,VS0,VE79',
+49 silly registry.get     'keep-alive': 'timeout=10, max=50',
+49 silly registry.get     connection: 'Keep-Alive' } ]
+50 silly lockFile 8942fdc3-bower-cli bower-cli@
+51 silly lockFile 8942fdc3-bower-cli bower-cli@
+52 http 200 https://registry.npmjs.org/install
+53 silly registry.get cb [ 200,
+53 silly registry.get   { date: 'Mon, 26 Jan 2015 03:56:10 GMT',
+53 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+53 silly registry.get     etag: '"2Y80AH02X9RP4HXCFU9U45X92"',
+53 silly registry.get     'content-type': 'application/json',
+53 silly registry.get     'cache-control': 'max-age=60',
+53 silly registry.get     'content-length': '10656',
+53 silly registry.get     'accept-ranges': 'bytes',
+53 silly registry.get     via: '1.1 varnish',
+53 silly registry.get     age: '0',
+53 silly registry.get     'x-served-by': 'cache-jfk1024-JFK',
+53 silly registry.get     'x-cache': 'HIT',
+53 silly registry.get     'x-cache-hits': '1',
+53 silly registry.get     'x-timer': 'S1422244570.258453,VS0,VE71',
+53 silly registry.get     vary: 'Accept',
+53 silly registry.get     'keep-alive': 'timeout=10, max=50',
+53 silly registry.get     connection: 'Keep-Alive' } ]
+54 silly addNameRange number 2 { name: 'install', range: '*', hasData: true }
+55 silly addNameRange versions [ 'install',
+55 silly addNameRange   [ '0.1.1',
+55 silly addNameRange     '0.1.2',
+55 silly addNameRange     '0.1.3',
+55 silly addNameRange     '0.1.4',
+55 silly addNameRange     '0.1.5',
+55 silly addNameRange     '0.1.6',
+55 silly addNameRange     '0.1.7',
+55 silly addNameRange     '0.1.8' ] ]
+56 verbose addNamed [ 'install', '0.1.8' ]
+57 verbose addNamed [ '0.1.8', '0.1.8' ]
+58 silly lockFile 584c81dc-install-0-1-8 install@0.1.8
+59 verbose lock install@0.1.8 /home/ubuntu/.npm/584c81dc-install-0-1-8.lock
+60 silly lockFile 584c81dc-install-0-1-8 install@0.1.8
+61 silly lockFile 584c81dc-install-0-1-8 install@0.1.8
+62 silly lockFile cadb329f-install install@
+63 silly lockFile cadb329f-install install@
+64 error 404 404 Not Found: bower-cli
+64 error 404
+64 error 404 'bower-cli' is not in the npm registry.
+64 error 404 You should bug the author to publish it
+64 error 404
+64 error 404 Note that you can also install from a
+64 error 404 tarball, folder, or http url, or git url.
+65 error System Linux 3.13.0-40-generic
+66 error command "/usr/bin/node" "/usr/bin/npm" "install" "install" "-g" "bower-cli"
+67 error cwd /home/ubuntu/choko
+68 error node -v v0.10.35
+69 error npm -v 1.4.28
+70 error code E404
+71 verbose exit [ 1, true ]

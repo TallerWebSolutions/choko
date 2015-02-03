@@ -1,11 +1,11 @@
-'use strict';
+// 'use strict';
 
 /**
  * @file Main AngularJS module for the Choko application.
  */
 
 // Declare app level module which depends on services, directives and filters.
-angular.module('choko', [
+module.exports = angular.module('choko', [
   'ngRoute',
   'ngResource',
   'ngSanitize',

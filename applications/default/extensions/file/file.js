@@ -191,22 +191,22 @@ file.route = function(routes, callback) {
 
       var File = application.type('file');
       File.validateAndSave({
-          filename: requestFile.originalname,
-          filetype: requestFile.mimetype,
-          size: parseInt(requestFile.size),
-          path: requestFile.path,
-          temporary: true
-        },
-        function(error, file) {
-          if (error) {
-            return callback(error);
-          }
+        filename: requestFile.originalname,
+        filetype: requestFile.mimetype,
+        size: parseInt(requestFile.size),
+        path: requestFile.path,
+        temporary: true
+      },
+      function(error, file) {
+        if (error) {
+          return callback(error);
+        }
 
-          // Pass only the id that's what we need for now.
-          callback(null, {
-            id: file.id
-          });
+        // Pass only the id that's what we need for now.
+        callback(null, {
+          id: file.id
         });
+      });
     }
   };
 

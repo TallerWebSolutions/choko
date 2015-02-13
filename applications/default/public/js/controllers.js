@@ -66,8 +66,8 @@ angular.module('choko')
   }
 ])
 
-.controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params',
-  function($scope, $location, $http, Choko, Restangular, Params) {
+.controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params', 'Token',
+  function($scope, $location, $http, Choko, Restangular, Params, Token) {
 
     // Prevente creation of service if no itemType set.
     if ($scope.view.itemType) {
@@ -88,6 +88,11 @@ angular.module('choko')
     Object.keys($scope.view.query || {}).forEach(function(param) {
       $scope.view.query[param] = Params.parse($scope.view.query[param], $scope);
     });
+
+    // Replace tokens in title.
+    if ($scope.view.title) {
+      $scope.view.title = Token.replace($scope.view.title, $scope);
+    }
 
     // Handle 'list' type views.
     if ($scope.view.type === 'list' && $scope.view.itemType) {

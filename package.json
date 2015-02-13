@@ -32,7 +32,7 @@
     "path-to-regexp": "0.1.x",
     "prana": "0.1.x",
     "sails-mongo": "0.10.x",
-    "validator": "2.0.x",
+    "validator": "3.30.x",
     "mkdirp": "0.3.x",
     "node-uuid": "1.4.x",
     "lodash": "2.x.x",

@@ -224,9 +224,15 @@ angular.module('choko')
 
           delete $scope.errors;
 
-          if (redirect) {
-            $location.path(redirect);
+          if ($scope.form.redirect) {
+            // Replace tokens in redirects. Make 'item' an alias to 'data'
+            // so item parser can be used in tokens.
+            $scope.item = $scope.data;
+            $scope.form.redirect = Token.replace($scope.form.redirect, $scope);
+
+            $location.path($scope.form.redirect);
           }
+
         }, function(response) {
           $scope.errors = response.data.data;
           $scope.status = response.status;

@@ -33,18 +33,15 @@ exampleType.type = function(types, callback) {
         title: 'Image',
         type: 'file'
       },
-      categories: {
-        title: 'Categories',
-        type: 'reference',
-        reference: {
-          type: 'category',
-          multiple: true,
-          titleField: 'title'
+      category: {
+        title: 'Category',
+        type: 'text',
+        options: {
+          'sports': 'Sports',
+          'politics': 'Politics'
         },
-        element: {
-          type: 'tag',
-          placeholder: 'Select categories...'
-        }
+        multiple: true,
+        required: true
       }
     },
     access: {
@@ -69,7 +66,16 @@ exampleType.page = function(pages, callback) {
     path: '/add-article',
     type: 'form',
     title: 'Add article',
-    formName: 'type-article'
+    formName: 'type-article',
+    itemType: 'article',
+    redirect: '/edit-article/[id|item]'
+  };
+  newPages['edit-article'] = {
+    path: '/edit-article/:id',
+    type: 'form',
+    title: 'Edit article',
+    formName: 'type-article',
+    itemType: 'article'
   };
 
   callback(null, newPages);

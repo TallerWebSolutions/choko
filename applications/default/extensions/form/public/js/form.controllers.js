@@ -96,11 +96,16 @@ angular.module('choko')
     };
   }])
 
-.controller('ReferenceElementController', ['$scope', '$controller', 'Choko',
-  function ($scope, $controller, Choko) {
+.controller('ReferenceElementController', ['$scope', '$controller', 'Choko', 'Params',
+  function ($scope, $controller, Choko, Params) {
     // Inherit ElementController.
     $controller('ElementController', {
       $scope: $scope
+    });
+
+    // Parse query params.
+    Object.keys($scope.element.reference.query || {}).forEach(function(param) {
+      $scope.element.reference.query[param] = Params.parse($scope.element.reference.query[param], $scope);
     });
 
     var query = {
@@ -115,7 +120,6 @@ angular.module('choko')
     // Get reference items to make a options list.
     Choko.get(query, function(response) {
       $scope.element.options = response;
-
       // Use radios if less then 5 options.
       $scope.fewOptions = ($scope.element.options && Object.keys($scope.element.options).length <= 5);
     });
@@ -273,4 +277,38 @@ angular.module('choko')
 
       return typeName;
     };
+  }])
+  .controller('TagElementController', ['$scope', '$controller', 'Choko',
+    function($scope, $controller, Choko){
+      // Inherit ElementController.
+      $controller('ReferenceElementController', {
+        $scope: $scope
+      });
+
+      $scope.tags = []
+
+      $scope.$watch($scope.element.options, toArray);
+
+      function toArray(options) {
+        if(options) {
+          Object.keys(options).forEach(function (name) {
+            $scope.tags.push(options[name]);
+          });
+        }
+      }
+
+      $scope.onRemoveTag = function($item, $model) {
+        console.log("remove: ", $item, $model);
+      }
+
+      $scope.onSelectTag = function($item, $model) {
+        console.log("select: ", $item, $model);
+      }
+
+      $scope.tagTransform = function (newTag) {
+        var item = {};
+        item[$scope.element.reference.titleField] = newTag;
+        return item;
+      };
+
   }])

@@ -67,4 +67,11 @@ angular.module('choko')
     require: ['^ckForm'],
     controller: 'InlineReferenceElementItemController'
   }
+})
+.directive('ckTagElement', function() {
+  return {
+    restrict: 'A',
+    require: ['^ckForm'],
+    controller: 'TagElementController'
+  }
 });

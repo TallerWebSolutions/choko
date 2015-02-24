@@ -11,7 +11,8 @@ var dependencies = [
   'ngSanitize',
   'summernote',
   'restangular',
-  'angularFileUpload'
+  'angularFileUpload',
+  'ui.select'
 ];
 
 // Declare main choko module.

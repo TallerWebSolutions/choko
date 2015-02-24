@@ -12,6 +12,7 @@
     "angular-summernote": "0.3.x",
     "ng-file-upload": "1.6.x",
     "lodash": "~2.4.1",
-    "restangular": "1.4.x"
+    "restangular": "1.4.x",
+    "ui-select": "angular-ui/ui-select#master"
   }
 }

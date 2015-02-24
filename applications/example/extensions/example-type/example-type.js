@@ -33,15 +33,17 @@ exampleType.type = function(types, callback) {
         title: 'Image',
         type: 'file'
       },
-      category: {
-        title: 'Category',
-        type: 'text',
-        options: {
-          'sports': 'Sports',
-          'politics': 'Politics'
+      categories: {
+        title: 'Categories',
+        type: 'reference',
+        reference: {
+          type: 'category',
+          multiple: true,
+          titleField: 'title'
         },
-        multiple: true,
-        required: true
+        element: {
+          type: 'tag'
+        }
       },
     },
     access: {

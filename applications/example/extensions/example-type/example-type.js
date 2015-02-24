@@ -32,6 +32,18 @@ exampleType.type = function(types, callback) {
       image: {
         title: 'Image',
         type: 'file'
+      },
+      categories: {
+        title: 'Categories',
+        type: 'reference',
+        reference: {
+          type: 'category',
+          multiple: true,
+          titleField: 'title'
+        },
+        element: {
+          type: 'tag'
+        }
       }
     },
     access: {

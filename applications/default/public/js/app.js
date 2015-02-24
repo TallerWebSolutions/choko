@@ -10,7 +10,8 @@ angular.module('choko', [
   'ngResource',
   'ngSanitize',
   'summernote',
-  'angularFileUpload'
+  'angularFileUpload',
+  'ui.select'
 ])
 
 .config(['$locationProvider', function($locationProvider) {

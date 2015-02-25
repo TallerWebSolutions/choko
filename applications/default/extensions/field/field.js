@@ -159,8 +159,9 @@ field.field = function(fields, callback) {
     }
   };
 
-  function checkTag(settings, tag, callback) {
+  function checkTag(settings, tag, params, callback) {
     var query = {};
+    var keyProperty = application.type(settings.reference.type).type.keyProperty;
     query[settings.reference.titleField] = tag;
 
     application.load(settings.reference.type, query, function(error, tagItem) {
@@ -169,13 +170,11 @@ field.field = function(fields, callback) {
       }
 
       if (!tagItem) {
-        var newTagItem = {};
-        newTagItem[settings.reference.titleField] = tag;
-        application.type(settings.reference.type).save(newTagItem, function (error, newTagItem) {
-          callback(null, newTagItem.id);
+        application.type(settings.reference.type).save(params, function (error, newTagItem) {
+          callback(null, newTagItem[keyProperty]);
         });
       } else {
-        callback(null, tagItem.id);
+        callback(null, tagItem[keyProperty]);
       }
     });
   }
@@ -188,7 +187,8 @@ field.field = function(fields, callback) {
         item[settings.name] = [];
 
         return async.each(referencedItems, function(referencedItem, next) {
-          checkTag(settings, referencedItem[settings.reference.titleField], function (error, referencedItemId) {
+          checkTag(settings, referencedItem[settings.reference.titleField], referencedItem,
+            function (error, referencedItemId) {
             item[settings.name].push(referencedItemId);
             next(null);
           });
@@ -198,8 +198,10 @@ field.field = function(fields, callback) {
         });
       }
 
-      checkTag(settings, referencedItem[settings.reference.titleField], next);
+      checkTag(settings, referencedItem[settings.reference.titleField], referencedItem, next);
     }
+
+    next(null);
   }
 
   newFields['reference'] = {

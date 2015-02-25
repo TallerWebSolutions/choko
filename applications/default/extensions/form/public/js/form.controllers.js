@@ -100,7 +100,9 @@ angular.module('choko')
     }
 
     // Get reference items to make a options list.
-    Choko.get(query, function(response) {
+    $scope.element.options = Choko.get(query);
+
+    $scope.element.options.$promise.then(function(response) {
       $scope.element.options = response;
       // Use radios if less then 5 options.
       $scope.fewOptions = ($scope.element.options && Object.keys($scope.element.options).length <= 5);
@@ -262,37 +264,38 @@ angular.module('choko')
       return typeName;
     };
   }])
-  .controller('TagElementController', ['$scope', '$controller', 'Choko',
-    function($scope, $controller, Choko){
-      // Inherit ElementController.
-      $controller('ReferenceElementController', {
-        $scope: $scope
+
+.controller('TagElementController', ['$scope', '$controller', 'Choko',
+  function($scope, $controller, Choko){
+    // Inherit ElementController.
+    $controller('ReferenceElementController', {
+      $scope: $scope
+    });
+
+    $scope.tags = []
+    $scope.filter = {};
+
+    $scope.element.options.$promise.then(function(options) {
+      delete options.$promise;
+      delete options.$resolved;
+
+      if(options) {
+        Object.keys(options).forEach(function (name) {
+          $scope.tags.push(options[name]);
+        });
+      }
+
+      var selectedTags = $scope.data[$scope.element.name] || [];
+      $scope.data[$scope.element.name] = [];
+
+      selectedTags.forEach(function(selectedTag) {
+        $scope.data[$scope.element.name].push(options[selectedTag]);
       });
+    });
 
-      $scope.tags = []
-
-      $scope.$watch($scope.element.options, toArray);
-
-      function toArray(options) {
-        if(options) {
-          Object.keys(options).forEach(function (name) {
-            $scope.tags.push(options[name]);
-          });
-        }
-      }
-
-      $scope.onRemoveTag = function($item, $model) {
-        console.log("remove: ", $item, $model);
-      }
-
-      $scope.onSelectTag = function($item, $model) {
-        console.log("select: ", $item, $model);
-      }
-
-      $scope.tagTransform = function (newTag) {
-        var item = {};
-        item[$scope.element.reference.titleField] = newTag;
-        return item;
-      };
-
-  }])
+    $scope.tagTransform = function (newTag) {
+      var item = {};
+      item[$scope.element.reference.titleField] = newTag;
+      return item;
+    };
+}])

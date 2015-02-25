@@ -171,7 +171,11 @@ field.field = function(fields, callback) {
       if (!tagItem) {
         var newTagItem = {};
         newTagItem[settings.reference.titleField] = tag;
-        application.type(settings.reference.type).save(newTagItem, callback);
+        application.type(settings.reference.type).save(newTagItem, function (error, newTagItem) {
+          callback(null, newTagItem.id);
+        });
+      } else {
+        callback(null, tagItem.id);
       }
     });
   }
@@ -181,8 +185,13 @@ field.field = function(fields, callback) {
 
       if (settings.reference.multiple) {
         var referencedItems = item[settings.name];
+        item[settings.name] = [];
+
         return async.each(referencedItems, function(referencedItem, next) {
-          checkTag(settings, referencedItem[settings.reference.titleField], next);
+          checkTag(settings, referencedItem[settings.reference.titleField], function (error, referencedItemId) {
+            item[settings.name].push(referencedItemId);
+            next(null);
+          });
         },
         function() {
           next();

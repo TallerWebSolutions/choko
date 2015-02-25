@@ -1,7 +1,5 @@
 <div ck-tag-element  class="form-group">
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
-  {{tags}}
-  {{data[element.name]}}
   <ui-select
     multiple
     tagging="tagTransform"
@@ -9,13 +7,12 @@
     theme="bootstrap"
     ng-disabled="disabled"
     reset-search-input="true"
-    on-select="someFunction($item, $model)"
     style="width: 100%;"
     title="Choose a tag">
 
     <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
 
-    <ui-select-choices repeat="tag in tags | propsFilter: {name: $select.search, age: $select.search}">
+    <ui-select-choices repeat="tag in tags | propsFilter: {title: $select.search}">
       <div
         ng-if="tag.isTag"
         ng-bind-html="tag[element.reference.titleField] +' <small>(new)</small>'| highlight: $select.search"></div>

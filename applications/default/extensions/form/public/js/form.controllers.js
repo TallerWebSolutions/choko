@@ -108,6 +108,11 @@ angular.module('choko')
       $scope.element.reference.query[param] = Params.parse($scope.element.reference.query[param], $scope);
     });
 
+    // Parse reference params.
+    Object.keys($scope.element.reference.params || {}).forEach(function(param) {
+      $scope.element.reference.params[param] = Params.parse($scope.element.reference.params[param], $scope);
+    });
+
     var query = {
       type: $scope.element.reference.type
     };
@@ -188,7 +193,7 @@ angular.module('choko')
       };
     }
     else {
-      if (!$scope.data[$scope.element.name]) {        
+      if (!$scope.data[$scope.element.name]) {
         $scope.data[$scope.element.name] = {};
       }
     }
@@ -312,6 +317,7 @@ angular.module('choko')
     $scope.tagTransform = function (newTag) {
       var item = {};
       item[$scope.element.reference.titleField] = newTag;
+      angular.extend(item, $scope.element.reference.params);
       return item;
     };
 }])

@@ -13,7 +13,7 @@
     style="width: 100%;"
     title="Choose a tag">
 
-    <ui-select-match placeholder="Select tag...">{{$item[element.reference.titleField]}}</ui-select-match>
+    <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
 
     <ui-select-choices repeat="tag in tags | propsFilter: {name: $select.search, age: $select.search}">
       <div

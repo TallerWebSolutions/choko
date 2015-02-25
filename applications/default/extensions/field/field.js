@@ -161,6 +161,7 @@ field.field = function(fields, callback) {
 
   function checkTag(settings, tag, callback) {
     var query = {};
+    var keyProperty = application.type(settings.reference.type).type.keyProperty;
     query[settings.reference.titleField] = tag;
 
     application.load(settings.reference.type, query, function(error, tagItem) {
@@ -172,10 +173,10 @@ field.field = function(fields, callback) {
         var newTagItem = {};
         newTagItem[settings.reference.titleField] = tag;
         application.type(settings.reference.type).save(newTagItem, function (error, newTagItem) {
-          callback(null, newTagItem.id);
+          callback(null, newTagItem[keyProperty]);
         });
       } else {
-        callback(null, tagItem.id);
+        callback(null, tagItem[keyProperty]);
       }
     });
   }
@@ -205,9 +206,23 @@ field.field = function(fields, callback) {
   newFields['reference'] = {
     title: 'Reference',
     schema: function(settings) {
-      var schema = {
-        type: settings.multiple ? 'array' : 'json'
-      };
+      var schema;
+
+      if ('element' in settings && 'type' in settings.element && settings.element.type === 'tag') {
+        schema = {};
+
+        if (settings.reference.multiple) {
+          schema.collection = settings.reference.type;
+        }
+        else {
+          schema.model = settings.reference.type;
+        }
+
+      } else {
+        schema = {
+          type: settings.reference.multiple ? 'array' : 'json'
+        };
+      }
 
       return schema;
     },
@@ -258,6 +273,13 @@ field.field = function(fields, callback) {
       // If we reach here, field value is not an array, or not an object, which
       // means it's an invalid value for an inline reference field.
       next(null, 'Invalid value supplied for field ' + settings.name);
+    },
+
+    find: function(settings, query, next) {
+      if ('element' in settings && 'type' in settings.element && settings.element.type === 'tag') {
+        query.populate(settings.name);
+      }
+      next();
     },
 
     beforeCreate: createUpdateTags,

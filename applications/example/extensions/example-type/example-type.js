@@ -42,7 +42,8 @@ exampleType.type = function(types, callback) {
           titleField: 'title'
         },
         element: {
-          type: 'tag'
+          type: 'tag',
+          placeholder: 'Select categories...'
         }
       },
     },

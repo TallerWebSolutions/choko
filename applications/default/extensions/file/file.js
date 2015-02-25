@@ -118,7 +118,7 @@ file.field = function(fields, callback) {
       }
 
       if (settings.required && !fileId) {
-        return next(null, settings.title + ' is required');
+        return next(null, 'is required');
       }
 
       application.load('file', fileId, function(error, file) {
@@ -126,8 +126,8 @@ file.field = function(fields, callback) {
           return next(error);
         }
 
-        if(!file) {
-          return next(null, "Error uploading the file");
+        if (!file) {
+          return next(null, 'Error uploading the file');
         }
 
         return next(null, true);
@@ -189,8 +189,7 @@ file.route = function(routes, callback) {
     callback: function(request, response, callback) {
       var requestFile = request.files.file;
 
-      var File = application.type('file');
-      File.validateAndSave({
+      application.type('file').save({
         filename: requestFile.originalname,
         filetype: requestFile.mimetype,
         size: parseInt(requestFile.size),
@@ -223,8 +222,7 @@ file.createPathAndSave = function(filePath, data, callback) {
     // a number suffix.
     if (exists) {
       fs.writeFile(filePath, data, callback);
-    }
-    else {
+    } else {
       utils.mkdir(dirName, function(error) {
         if (error) {
           return callback(error);

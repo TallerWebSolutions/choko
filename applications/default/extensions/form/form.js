@@ -103,13 +103,13 @@ form.form = function(forms, callback) {
             element.type = field.element;
             break;
 
-          // If element is a object it's the element settings object.
+            // If element is a object it's the element settings object.
           case 'object':
             utils.extend(element, field.element);
             break;
 
-          // If element is a function run it to get the element settings
-          // object.
+            // If element is a function run it to get the element settings
+            // object.
           case 'function':
             utils.extend(element, field.element(fieldSettings));
             break;
@@ -128,6 +128,11 @@ form.form = function(forms, callback) {
       // Add field options for select and other types if any.
       if (fieldSettings.options) {
         element.options = fieldSettings.options;
+      }
+
+      // Forward 'multiple' property.
+      if (fieldSettings.multiple) {
+        element.multiple = fieldSettings.multiple;
       }
 
       // Bypass 'internal' fields.
@@ -164,8 +169,7 @@ form.form = function(forms, callback) {
           // Allow a string as element property value in this case this will be
           // the element type.
           element.type = fieldSettings.element;
-        }
-        else {
+        } else {
           // Merge in element settings.
           utils.extend(element, fieldSettings.element);
         }
@@ -181,7 +185,9 @@ form.form = function(forms, callback) {
           name: 'submit',
           title: 'Save',
           type: 'submit',
-          url: '/rest/' + (typeSettings.mainTypeName || typeName),
+          // @note: Commented this line because we are using Restangular to build URLs
+          // in the frontend side.
+          // url: '/rest/' + (typeSettings.mainTypeName || typeName),
           classes: ['btn-primary'],
           weight: 50
         });

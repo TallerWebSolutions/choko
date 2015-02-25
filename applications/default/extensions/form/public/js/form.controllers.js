@@ -13,8 +13,13 @@ angular.module('choko')
 
 .controller('ElementController', ['$scope',
   function ($scope) {
+
+    var elementName = !$scope.element.isSubform ?
+      $scope.element.name :
+      $scope.subform.name + '-' + $scope.element.name;
+
     $scope.element.template = $scope.element.template || '/templates/' + $scope.element.type + '.html';
-    $scope.element.id = $scope.element.id || 'element-' + $scope.form.name + '-' + $scope.element.name;
+    $scope.element.id = $scope.element.id || 'element-' + $scope.form.name + '-' + elementName;
   }])
 
 .controller('FileElementController', ['$scope', '$controller', '$upload',
@@ -28,12 +33,21 @@ angular.module('choko')
 
     // Initialize files container.
     // @todo support multiple files.
-    if ($scope.data[$scope.element.name] && $scope.data[$scope.element.name] instanceof Object) {
-      $scope.data[$scope.element.name] =  $scope.data[$scope.element.name].id;
-    }
-    else {
-      $scope.data[$scope.element.name] =  null;
-    }
+
+    if (!$scope.subform) {
+
+      var file = $scope.data[$scope.element.name] || null;
+      $scope.data[$scope.element.name] = file instanceof Object ?
+        $scope.data[$scope.element.name].id :
+        null;
+
+    } else {
+
+      var file = $scope.data[$scope.subform.name][$scope.element.name] || null;
+      $scope.data[$scope.subform.name][$scope.element.name] = file instanceof Object ?
+        file.id :
+        null;
+    };
 
     $scope.onFileSelect = function($files) {
       for (var i = 0; i < $files.length; i++) {
@@ -46,7 +60,11 @@ angular.module('choko')
           $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
         })
         .success(function(data, status, headers, config) {
-          $scope.data[$scope.element.name] = data.data.id;
+          if (!$scope.subform) {
+            $scope.data[$scope.element.name] = data.data.id;
+          } else{
+            $scope.data[$scope.subform.name][$scope.element.name] = data.data.id;
+          };
         });
       }
     };
@@ -78,11 +96,21 @@ angular.module('choko')
     };
   }])
 
-.controller('ReferenceElementController', ['$scope', '$controller', 'Choko',
-  function ($scope, $controller, Choko) {
+.controller('ReferenceElementController', ['$scope', '$controller', 'Choko', 'Params',
+  function ($scope, $controller, Choko, Params) {
     // Inherit ElementController.
     $controller('ElementController', {
       $scope: $scope
+    });
+
+    // Parse query params.
+    Object.keys($scope.element.reference.query || {}).forEach(function(param) {
+      $scope.element.reference.query[param] = Params.parse($scope.element.reference.query[param], $scope);
+    });
+
+    // Parse reference params.
+    Object.keys($scope.element.reference.params || {}).forEach(function(param) {
+      $scope.element.reference.params[param] = Params.parse($scope.element.reference.params[param], $scope);
     });
 
     var query = {
@@ -95,9 +123,10 @@ angular.module('choko')
     }
 
     // Get reference items to make a options list.
-    Choko.get(query, function(response) {
-      $scope.element.options = response;
+    $scope.element.options = Choko.get(query);
 
+    $scope.element.options.$promise.then(function(response) {
+      $scope.element.options = response;
       // Use radios if less then 5 options.
       $scope.fewOptions = ($scope.element.options && Object.keys($scope.element.options).length <= 5);
     });
@@ -130,7 +159,7 @@ angular.module('choko')
     var multiple = $scope.element.reference.multiple;
 
     // Subform errors are handled separately.
-    $scope.errors = [];
+    $scope.errors = null;
 
     if (multiple) {
       // Initialize items container.
@@ -164,11 +193,8 @@ angular.module('choko')
       };
     }
     else {
-      if ($scope.data[$scope.element.name]) {
-        $scope.data = $scope.data[$scope.element.name];
-      }
-      else {
-        $scope.data = $scope.data[$scope.element.name] = {};
+      if (!$scope.data[$scope.element.name]) {
+        $scope.data[$scope.element.name] = {};
       }
     }
 
@@ -176,11 +202,12 @@ angular.module('choko')
       // Start by destroying the subform and its data.
       // @todo: eventually we may want to add a confirmation, if form is "dirty".
       delete $scope.element.subform;
-      $scope.data = {};
+      $scope.subform = {};
 
       // Get the new subform from the REST server.
       Choko.get({type: 'form', key: 'type-' + type}, function(response) {
         var subform = $scope.element.subform = response;
+        $scope.subform.name = $scope.element.name;
 
         // We are editing a item, store data.
         if (data) {
@@ -258,3 +285,39 @@ angular.module('choko')
       return typeName;
     };
   }])
+
+.controller('TagElementController', ['$scope', '$controller', 'Choko',
+  function($scope, $controller, Choko){
+    // Inherit ElementController.
+    $controller('ReferenceElementController', {
+      $scope: $scope
+    });
+
+    $scope.tags = []
+    $scope.filter = {};
+
+    $scope.element.options.$promise.then(function(options) {
+      delete options.$promise;
+      delete options.$resolved;
+
+      if(options) {
+        Object.keys(options).forEach(function (name) {
+          $scope.tags.push(options[name]);
+        });
+      }
+
+      var selectedTags = $scope.data[$scope.element.name] || [];
+      $scope.data[$scope.element.name] = [];
+
+      selectedTags.forEach(function(selectedTag) {
+        $scope.data[$scope.element.name].push(options[selectedTag]);
+      });
+    });
+
+    $scope.tagTransform = function (newTag) {
+      var item = {};
+      item[$scope.element.reference.titleField] = newTag;
+      angular.extend(item, $scope.element.reference.params);
+      return item;
+    };
+}])

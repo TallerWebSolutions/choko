@@ -30,6 +30,13 @@ field.field = function(fields, callback) {
   newFields['text'] = {
     title: 'Text',
     schema: function(settings) {
+      // If options and multiple is set, schema should be a array.
+      if (settings.options && settings.multiple) {
+        return {
+          type: 'array'
+        };
+      }
+
       var schema = {
         type: (settings.maxLength > 256) ? 'text' : 'string'
       };
@@ -50,13 +57,15 @@ field.field = function(fields, callback) {
       };
     },
     validate: function(settings, item, next) {
+      // @todo: validate if value is within options when it's a select field.
+
       // Default minLenght to 1.
       settings.minLength = settings.minLength || 1;
 
       // Default maxLenght to 256.
       settings.maxLength = settings.maxLength || 256;
 
-      next(null, !validator.notEmpty(item[settings.name]) || validator.len(item[settings.name].toString(), settings.minLength, settings.maxLength) || 'Value must have from ' + settings.minLength + ' to ' + settings.maxLength + ' characters.');
+      next(null, !validator.notEmpty(item[settings.name]) || validator.len(item[settings.name].toString(), settings.minLength, settings.maxLength) || 'must have from ' + settings.minLength + ' to ' + settings.maxLength + ' characters.');
     }
   };
 
@@ -78,7 +87,7 @@ field.field = function(fields, callback) {
     },
     element: 'number',
     validate: function(settings, item, next) {
-      next(null, validator.isNumeric(item[settings.name].toString()) || 'Invalid number.');
+      next(null, validator.isNumeric(item[settings.name].toString()) || 'must be a valid number.');
     }
   };
 
@@ -87,7 +96,7 @@ field.field = function(fields, callback) {
     schema: 'date',
     element: 'date',
     validate: function(settings, item, next) {
-      next(null, validator.isDate(item[settings.name].toString()) || 'Invalid date.');
+      next(null, validator.isDate(item[settings.name].toString()) || 'must be a valid date.');
     }
   };
 
@@ -96,7 +105,7 @@ field.field = function(fields, callback) {
     schema: 'datetime',
     element: 'datetime',
     validate: function(settings, item, next) {
-      next(null, validator.isDate(item[settings.name].toString()) || 'Invalid date/time.');
+      next(null, validator.isDate(item[settings.name].toString()) || 'must be a valid date/time.');
     }
   };
 
@@ -116,7 +125,7 @@ field.field = function(fields, callback) {
     validate: function(settings, item, next) {
       // Email validator oddly returns the email itself, so need to convert to
       // boolean.
-      next(null, !!validator.isEmail(item[settings.name].toString()) || 'Invalid email.');
+      next(null, !!validator.isEmail(item[settings.name].toString()) || 'must be a valid email.');
     }
   };
 
@@ -128,7 +137,7 @@ field.field = function(fields, callback) {
     },
     element: 'url',
     validate: function(settings, item, next) {
-      next(null, validator.isUrl(item[settings.name].toString()) || 'Invalid URL.');
+      next(null, validator.isUrl(item[settings.name].toString()) || 'must be a valid URL.');
     }
   };
 
@@ -146,9 +155,54 @@ field.field = function(fields, callback) {
     element: 'password',
     validate: function(settings, item, next) {
       var minLength = settings.minLength || 6;
-      next(null, validator.len(item[settings.name].toString(), settings.minLength || 6) || 'Password must have at least ' + minLength + ' characters.');
+      next(null, validator.len(item[settings.name].toString(), settings.minLength || 6) || 'must have at least ' + minLength + ' characters.');
     }
   };
+
+  function checkTag(settings, tag, params, callback) {
+    var query = {};
+    var keyProperty = application.type(settings.reference.type).type.keyProperty;
+    query[settings.reference.titleField] = tag;
+
+    application.load(settings.reference.type, query, function(error, tagItem) {
+      if (error) {
+        return callback(error);
+      }
+
+      if (!tagItem) {
+        application.type(settings.reference.type).save(params, function (error, newTagItem) {
+          callback(null, newTagItem[keyProperty]);
+        });
+      } else {
+        callback(null, tagItem[keyProperty]);
+      }
+    });
+  }
+
+  function createUpdateTags(settings, item, next) {
+    if ('element' in settings && 'type' in settings.element && settings.element.type === 'tag') {
+
+      if (settings.reference.multiple) {
+        var referencedItems = item[settings.name];
+        item[settings.name] = [];
+
+        return async.each(referencedItems, function(referencedItem, next) {
+          checkTag(settings, referencedItem[settings.reference.titleField], referencedItem,
+            function (error, referencedItemId) {
+            item[settings.name].push(referencedItemId);
+            next(null);
+          });
+        },
+        function() {
+          next();
+        });
+      }
+
+      checkTag(settings, referencedItem[settings.reference.titleField], referencedItem, next);
+    }
+
+    next(null);
+  }
 
   newFields['reference'] = {
     title: 'Reference',
@@ -206,7 +260,12 @@ field.field = function(fields, callback) {
       // If we reach here, field value is not an array, or not an object, which
       // means it's an invalid value for an inline reference field.
       next(null, 'Invalid value supplied for field ' + settings.name);
-    }
+    },
+
+    beforeCreate: createUpdateTags,
+
+    beforeUpdate: createUpdateTags
+
   };
 
   callback(null, newFields);

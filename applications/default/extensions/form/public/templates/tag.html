@@ -6,7 +6,8 @@
     ng-model="data[element.name]"
     theme="bootstrap"
     ng-disabled="disabled"
-    reset-search-input="true">
+    reset-search-input="true"
+    id="{{element.id}}">
 
     <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
 

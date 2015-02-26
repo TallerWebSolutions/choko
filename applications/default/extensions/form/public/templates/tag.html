@@ -6,13 +6,12 @@
     ng-model="data[element.name]"
     theme="bootstrap"
     ng-disabled="disabled"
-    reset-search-input="true"
-    style="width: 100%;"
-    title="Choose a tag">
+    reset-search-input="true">
 
     <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
 
     <ui-select-choices repeat="tag in tags | propsFilter: {title: $select.search}">
+
       <div
         ng-if="tag.isTag"
         ng-bind-html="tag[element.reference.titleField] +' <small>(new)</small>'| highlight: $select.search"></div>

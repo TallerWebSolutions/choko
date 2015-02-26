@@ -284,13 +284,6 @@ angular.module('choko')
           $scope.tags.push(options[name]);
         });
       }
-
-      var selectedTags = $scope.data[$scope.element.name] || [];
-      $scope.data[$scope.element.name] = [];
-
-      selectedTags.forEach(function(selectedTag) {
-        $scope.data[$scope.element.name].push(options[selectedTag]);
-      });
     });
 
     $scope.tagTransform = function (newTag) {

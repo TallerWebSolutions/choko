@@ -1,4 +1,4 @@
-<div ck-tag-element  class="form-group">
+<div ck-tag-element class="form-group">
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
   <ui-select
     multiple
@@ -8,7 +8,8 @@
     ng-disabled="disabled"
     reset-search-input="true"
     style="width: 100%;"
-    title="Choose a tag">
+    title="Choose a tag"
+    id="{{element.id}}">
 
     <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
 

@@ -33,6 +33,13 @@ exampleType.type = function(types, callback) {
         title: 'Image',
         type: 'file'
       },
+      category: {
+        title: 'Category',
+        type: 'reference',
+        reference: {
+          type: 'category'
+        }
+      },
       categories: {
         title: 'Categories',
         type: 'reference',
@@ -45,7 +52,7 @@ exampleType.type = function(types, callback) {
           type: 'tag',
           placeholder: 'Select categories...'
         }
-      },
+      }
     },
     access: {
       'list': true,

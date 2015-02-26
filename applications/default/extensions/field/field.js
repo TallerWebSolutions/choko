@@ -175,7 +175,8 @@ field.field = function(fields, callback) {
         application.type(settings.reference.type).save(newTagItem, function (error, newTagItem) {
           callback(null, newTagItem[keyProperty]);
         });
-      } else {
+      }
+      else {
         callback(null, tagItem[keyProperty]);
       }
     });
@@ -183,7 +184,6 @@ field.field = function(fields, callback) {
 
   function createUpdateTags(settings, item, next) {
     if ('element' in settings && 'type' in settings.element && settings.element.type === 'tag') {
-
       if (settings.reference.multiple) {
         var referencedItems = item[settings.name];
         item[settings.name] = [];
@@ -191,18 +191,15 @@ field.field = function(fields, callback) {
         return async.each(referencedItems, function(referencedItem, next) {
           checkTag(settings, referencedItem[settings.reference.titleField], function (error, referencedItemId) {
             item[settings.name].push(referencedItemId);
-            next(null);
+            next();
           });
-        },
-        function() {
-          next();
-        });
+        }, next);
       }
 
-      checkTag(settings, referencedItem[settings.reference.titleField], next);
-    } else {
-      next();
+      return checkTag(settings, referencedItem[settings.reference.titleField], next);
     }
+
+    next();
   }
 
   newFields['reference'] = {
@@ -219,8 +216,8 @@ field.field = function(fields, callback) {
         else {
           schema.model = settings.reference.type;
         }
-
-      } else {
+      }
+      else {
         schema = {
           type: settings.reference.multiple ? 'array' : 'json'
         };

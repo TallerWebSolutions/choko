@@ -200,6 +200,8 @@ field.field = function(fields, callback) {
       }
 
       checkTag(settings, referencedItem[settings.reference.titleField], next);
+    } else {
+      next();
     }
   }
 

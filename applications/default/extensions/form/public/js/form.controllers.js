@@ -302,6 +302,7 @@ angular.module('choko')
 
       if(options) {
         Object.keys(options).forEach(function (name) {
+          if (options[name].isTag) delete options[name].isTag;
           $scope.tags.push(options[name]);
         });
       }

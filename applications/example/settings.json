@@ -1,5 +1,5 @@
 {
-  "database": "mongodb://localhost/example",
+  "database": "mongodb://localhost/choko-example",
   "sessionSecret": "change-me",
   "application": {
     "name": "Example"

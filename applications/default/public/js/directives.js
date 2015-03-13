@@ -36,6 +36,9 @@ angular.module('choko')
     };
   }])
 
+  // @todo: Verify if the directives ckReplaceAndRecompile, ckReplaceElement
+  // and ckButtonOld are using.
+
   // A helper service to handle re-compiling of directives.
   .factory('ckReplaceAndRecompile', ['$compile', function ($compile) {
     /**
@@ -132,7 +135,7 @@ angular.module('choko')
     };
   }])
 
-  .directive('ckButton', function($http, $compile) {
+  .directive('ckButton', ['$http', '$compile', function($http, $compile) {
     return {
       restrict: 'E',
       scope: true,
@@ -148,4 +151,4 @@ angular.module('choko')
         };
       }
     };
-  });
+  }]);

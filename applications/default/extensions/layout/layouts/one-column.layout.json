@@ -7,7 +7,7 @@
     {
       "name": "navbar",
       "title": "Navbar",
-      "template": "/templates/navbar.html",
+      "component": "NavBar",
       "columns": [
         {
           "name": "navbar-header",

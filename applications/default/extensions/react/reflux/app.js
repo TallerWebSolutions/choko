@@ -21,11 +21,10 @@ module.exports = function (args, callback) {
 
   var refluxApp = new Reflux(refluxDefinitions);
 
-  // @TODO: Dehydrate stores.
+  // @TODO: Dehydrate stores should be a method of the Relfux App.
   lodash(refluxApp.stores).each(function (store, name) {
     store.state = dehydratedState[name.toLowerCase()];
   });
-  // console.log(refluxApp.stores)
 
   var NotFound = React.createClass({
     render: function () {

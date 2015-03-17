@@ -4,6 +4,8 @@ var React = require('react');
 
 var connectStoresToLocalState = require('../mixins/connectStoresToLocalState.js');
 
+var Layout = require('./Layout.jsx');
+
 var PageComponent = React.createClass({
   mixins: [connectStoresToLocalState(['Page'])],
   getInitialState: function() {
@@ -12,8 +14,7 @@ var PageComponent = React.createClass({
   render: function () {
     return (
       <section className="Page">
-        <h2>{this.state.page.title}</h2>
-        <div className="content" dangerouslySetInnerHTML={{__html: this.state.page.content}}/>
+        <Layout />
       </section>
     );
   }

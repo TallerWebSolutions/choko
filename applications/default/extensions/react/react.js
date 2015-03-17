@@ -16,11 +16,11 @@ ReactHook.response = function (payload, request, response, callback) {
   this.application.collect('route', function (error, routes) {
 
     var pagePaths = [];
-    lodash(routes).each(function (route) {
+    lodash.each(routes, function (route) {
       if (route.router === 'page') {
         return pagePaths.push(route.path);
       }
-    }).__wrapped__;
+    });
 
     // Execute.
     self.application.pick('route', request.route.path, function(error, current_route) {

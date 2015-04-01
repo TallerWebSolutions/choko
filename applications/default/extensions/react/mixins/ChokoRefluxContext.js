@@ -1,8 +1,8 @@
 var React = require("react/addons");
 
-var RefluxMixin = require("./Reflux.js");
+var RefluxMixin = require("./ChokoReflux.js");
 
-var RefluxContextMixin = {
+var ChokoRefluxContextMixin = {
   "propTypes": {
     "reflux": React.PropTypes.object.isRequired,
   },
@@ -16,4 +16,4 @@ var RefluxContextMixin = {
   },
 };
 
-module.exports = RefluxContextMixin;
+module.exports = ChokoRefluxContextMixin;

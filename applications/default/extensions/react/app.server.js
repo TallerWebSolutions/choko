@@ -1,1 +1,1 @@
-module.exports = require("./reflux/app.js");
+module.exports = require("./app.js");

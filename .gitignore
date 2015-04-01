@@ -4,3 +4,4 @@ node_modules
 # Ignore client side-side library code.
 applications/default/public/lib
 
+.DS_Store

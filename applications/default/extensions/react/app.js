@@ -6,11 +6,12 @@ var {Route, DefaultRoute, NotFoundRoute, RouteHandler} = Router;
 // var DocumentTitle = require('react-document-title');
 
 // Basic components.
-var AppComponent = require('../components/App.jsx');
-var HtmlComponent = require('../components/Html.jsx');
-var PageComponent = require('../components/Page.jsx');
+var AppComponent = require('./components/App.jsx');
+var HtmlComponent = require('./components/Html.jsx');
+var PageComponent = require('./components/Page.jsx');
 
-
+// @TODO: Move things for server/client specific to the
+//        files app.client.js or app.server.js. 
 module.exports = function (args, callback) {
   var {
     requestUrl,

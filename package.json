@@ -37,7 +37,6 @@
     "node-uuid": "1.4.x",
     "lodash": "2.x.x",
     "cors": "^2.4.1",
-    "vhost": "2.0.x",
     "waterline": "0.10.x",
     "waterline-prana": "recidive/waterline-prana#master"
   },

@@ -1,6 +1,5 @@
 'use strict';
 
-
 /**
  * @file Choko core controllers.
  */
@@ -16,26 +15,26 @@ angular.module('choko')
 
       $http.get(path)
         .success(function(data, status, headers, config) {
-          if (data.data.redirect) {
+          if (data.redirect) {
             // Server returned a redirect.
-            if (data.data.url) {
-              return window.location.href = data.data.redirect;
+            if (data.url) {
+              return window.location.href = data.redirect;
             } else {
-              return $location.path(data.data.redirect);
+              return $location.path(data.redirect);
             };
           }
 
           // Rebuild the layout only when context changes.
-          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.data.contexts.toString()) {
+          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.contexts.toString()) {
             // Update only panels in content region, and page information.
             // @todo: get the region the page-content panel is attached to
             // dinamically currently this is hadcoded to 'content' and will not work
             // if the page-content panel is attacehd to a different region.
-            $rootScope.panels['content'] = data.data.panels['content'];
-            $rootScope.page = data.data.page;
+            $rootScope.panels['content'] = data.panels['content'];
+            $rootScope.page = data.page;
           } else {
             // Merge data from the server.
-            angular.extend($rootScope, data.data);
+            angular.extend($rootScope, data);
 
             // Store scope as application state.
             applicationState.set($rootScope);
@@ -43,7 +42,7 @@ angular.module('choko')
         })
         .error(function(data, status, headers, config) {
           // Merge data from the server.
-          angular.extend($rootScope.page, data.data);
+          angular.extend($rootScope.page, data);
 
           $rootScope.page.template = '/templates/error.html';
 
@@ -239,7 +238,7 @@ angular.module('choko')
           }
 
         }, function(response) {
-          $scope.errors = response.data.data;
+          $scope.errors = response.data;
           $scope.status = response.status;
         });
       };

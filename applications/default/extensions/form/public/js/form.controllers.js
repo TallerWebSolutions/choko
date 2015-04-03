@@ -61,9 +61,9 @@ angular.module('choko')
         })
         .success(function(data, status, headers, config) {
           if (!$scope.subform) {
-            $scope.data[$scope.element.name] = data.data.id;
+            $scope.data[$scope.element.name] = data.id;
           } else{
-            $scope.data[$scope.subform.name][$scope.element.name] = data.data.id;
+            $scope.data[$scope.subform.name][$scope.element.name] = data.id;
           };
         });
       }

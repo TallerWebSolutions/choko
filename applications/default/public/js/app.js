@@ -50,15 +50,16 @@ angular.module('choko', dependencies)
         if (operation === 'getList') {
           var temp = [];
 
-          Object.keys(data.data).forEach(function(name) {
-            temp.push(data.data[name]);
+          Object.keys(data).forEach(function(name) {
+            temp.push(data[name]);
           });
+
           extractedData = temp;
         } else if (operation === 'put') {
-          extractedData = data.data;
+          extractedData = data;
           extractedData.updated = true;
         } else {
-          extractedData = data.data;
+          extractedData = data;
         }
         return extractedData;
       });

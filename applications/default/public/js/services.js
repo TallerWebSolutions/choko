@@ -17,11 +17,7 @@ angular.module('choko')
     var actions = {
       'get': {
         method: 'GET',
-        transformResponse: function (data) {
-          return angular.fromJson(data).data;
-        },
-        // Server will always return an object containing at least a 'data'
-        // property to hold the actual data and a status property.
+        // Data is an Object, not an Array.
         isArray: false
       }
     }

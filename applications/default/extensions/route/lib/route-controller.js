@@ -133,7 +133,8 @@ RouteController.respond = function(request, response, content, code, decorator) 
   var payload = {
     status: {
       code: code
-    }
+    },
+    data: null
   };
 
   if (content) {
@@ -142,11 +143,15 @@ RouteController.respond = function(request, response, content, code, decorator) 
 
   if (decorator) {
     return decorator(payload, request, response, function() {
-      response.status(payload.status.code).send(payload);
+      response
+        .status(payload.status.code)
+        .send(payload.data);
     });
   }
 
-  response.status(code).send(payload);
+  response
+    .status(payload.status.code)
+    .send(payload.data);
 };
 
 /**

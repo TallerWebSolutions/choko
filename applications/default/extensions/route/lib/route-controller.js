@@ -130,6 +130,7 @@ RouteController.respond = function(request, response, content, code, decorator) 
   // Default to 200 (success).
   var code = code || 200;
 
+  // Create a payload envelope to pass to the decorator function.
   var payload = {
     status: {
       code: code

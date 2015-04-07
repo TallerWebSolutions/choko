@@ -25,9 +25,14 @@ user.init = function(application, callback) {
   application.routers.rest.use(passportSessionMiddleware);
   application.routers.page.use(passportSessionMiddleware);
 
-  var authCallback = function(username, password, callback) {
-    var User = application.type('user');
-    User.login({username: username, password: password}, function (error, user) {
+  var User = application.type('user');
+  var self = this;
+
+  var authCallback = function(usernameOrEmail, password, callback) {
+    var data = {password: password};
+    data[(self.settings.emailLogin ? 'email' : 'username')] = usernameOrEmail;
+
+    User.login(data, function (error, user) {
       if (error) {
         return callback(error);
       }
@@ -53,11 +58,39 @@ user.init = function(application, callback) {
     });
   };
 
+  var cleanUser = function (data, callback) {
+    User.load({id: data.id}, function (error, user) {
+      if (error) {
+        return callback(error);
+      }
+      if (!user) {
+        // User and/or password is invalid.
+        return callback(null, false);
+      }
+
+      user.roles = user.roles || [];
+
+      delete user.password;
+      delete user.salt;
+
+      // Add authenticated role.
+      user.roles.push('authenticated');
+
+      callback(null, user);
+    });
+  };
+
   // Set up passport local strategy.
-  passport.use(new LocalStrategy(authCallback));
+  passport.use(new LocalStrategy({
+    usernameField: (self.settings.emailLogin ? 'email' : 'username'),
+    passwordField: 'password'
+  }, authCallback));
 
   // Set up passport HTTP strategy.
-  passport.use(new BasicStrategy(authCallback));
+  passport.use(new BasicStrategy({
+    usernameField: (self.settings.emailLogin ? 'email' : 'username'),
+    passwordField: 'password'
+  }, authCallback));
 
   // Set up passport anonymous strategy.
   passport.use(new AnonymousStrategy());
@@ -67,7 +100,7 @@ user.init = function(application, callback) {
   });
 
   passport.deserializeUser(function(user, callback) {
-    callback(null, user);
+    cleanUser(user, callback);
   });
 
   // Add access check method to application object.
@@ -122,8 +155,13 @@ user.type = function(types, callback) {
     title: 'User',
     description: 'Application users.',
     storage: 'database',
-    keyProperty: 'username',
+    keyProperty: 'id',
     fields: {
+      id: {
+        title: 'Id',
+        type: 'id',
+        internal: true
+      },
       username: {
         title: 'Username',
         type: 'text',
@@ -175,7 +213,7 @@ user.type = function(types, callback) {
             return callback(null, false);
           }
           // Allow if user is the same as logged in user.
-          callback(null, request.params.user && request.params.user == request.user.username);
+          callback(null, request.params.user && request.params.user == request.user.id);
         });
       },
       'add': 'manage-users',
@@ -216,8 +254,13 @@ user.type = function(types, callback) {
     },
     statics: {
       login: function(data, callback) {
+
         var User = this;
-        this.load(data.username, function(error, account) {
+        var query = {};
+        var name = self.settings.emailLogin ? 'email' : 'username';
+        query[name] = data[name];
+
+        this.load(query, function(error, account) {
           if (error) {
             return callback(error);
           }
@@ -376,6 +419,7 @@ user.normalizeUserData = function(data, callback) {
 user.route = function(routes, callback) {
   var newRoutes = {};
   var application = this.application;
+  var self = this;
 
   // We create routes to form submits until we figure out what approach to use
   // for handling form submits.
@@ -383,6 +427,15 @@ user.route = function(routes, callback) {
     access: 'create-account',
     callback: function(request, response, callback) {
       var data = request.body;
+      var fieldName = self.settings.emailAsUsername ? 'email' : 'username';
+
+      if(fieldName === 'email') {
+        data.username = data.email;
+      }
+
+      if (!(fieldName in data)) {
+        return callback(null, [self.messages('provide-field')], 400);
+      }
 
       // @todo commented this out as this was breking some tests, need to
       // refactor tests when we fix this for validating the user instance
@@ -392,12 +445,16 @@ user.route = function(routes, callback) {
       //}
 
       var User = application.type('user');
-      User.load(data.username, function(error, account) {
+      var query = {};
+
+      query[fieldName] = data[fieldName];
+
+      User.load(query, function(error, account) {
         if (error) {
           return callback(error);
         }
         if (account) {
-          return callback(null, ['This username is not available, please choose another one.'], 409);
+          return callback(null, [self.messages('not-available')], 409);
         }
         if (data.password != data['password-confirm']) {
           return callback(null, ['Passwords must match.'], 400);
@@ -434,28 +491,30 @@ user.route = function(routes, callback) {
     }
   };
 
-  newRoutes['/settings/edit-account-submit/:username'] = {
+  newRoutes['/settings/edit-account-submit/:id*'] = {
     access: 'edit-own-account',
     callback: function(request, response, callback) {
-      // @todo: figure out how to prevent form controller from sending the
-      // username.
-      if (request.user.username != request.params.username) {
-        return callback(null, ['Invalid user.'], 400);
-      }
-
       var data = request.body;
+      var validateFields = ['username', 'email']
 
       // Delete unwanted data that may lead to security holes.
       delete data.id;
-      delete data.username;
       delete data.password;
       delete data.salt;
       delete data.roles;
 
       var User = application.type('user');
-      User.load(request.user.username, function(error, account) {
+
+      if (self.settings.emailAsUsername) {
+        data.username = data.email;
+        validateFields.shift();
+      }
+
+      User.load(request.user.id, function(error, account) {
         utils.extend(account, data);
-        User.validateAndSave(account, function(error, account, errors) {
+        delete account.password;
+
+        User.validateAndSave(account, validateFields, function(error, account, errors) {
           if (error) {
             return callback(error);
           }
@@ -490,7 +549,7 @@ user.route = function(routes, callback) {
       }
 
       var User = application.type('user');
-      User.load(user.username, function(error, account) {
+      User.load({id: user.id}, function(error, account) {
         if (error) {
           return callback(error);
         }
@@ -538,16 +597,19 @@ user.route = function(routes, callback) {
       // Check if there are both an username and a password.
       // @todo in the long run we may need a way to validate forms that aren't
       // directly related to a type.
-      if (!request.body.username || !request.body.password) {
-        return callback(null, ['Please provide an username and a password.'], 400);
+      var username = !self.settings.emailLogin ? request.body.username : request.body.email;
+
+      if (!username || !request.body.password) {
+        return callback(null, [self.messages('provide')], 400);
       }
-      passport.authenticate('local', function(error, account) {
+
+      passport.authenticate('local', function(error, account, info) {
         if (error) {
           return callback(error);
         }
 
         if (!account) {
-          return callback(null, ['Invalid username or password.'], 401);
+          return callback(null, [self.messages('invalid')], 401);
         }
 
         // Log user in.
@@ -718,3 +780,68 @@ user.access = function(request, permission, callback) {
     callback(null, result !== undefined);
   });
 };
+
+user.messages = function(name) {
+  var messages = {};
+  var loginFieldName = this.settings.emailLogin ? 'email' : 'username';
+  var accountFieldName = this.settings.emailAsUsername ? 'email' : 'username';
+
+  messages['provide'] = 'Please provide an ' + loginFieldName + ' and a password.';
+  messages['invalid'] = 'Invalid ' + loginFieldName + ' or password.';
+
+  messages['not-available'] = 'This ' + accountFieldName + ' is not available, please choose another one.';
+  messages['provide-field'] = 'Please provide an ' + accountFieldName  + '.';
+
+  return messages[name];
+};
+
+/**
+ * The form() hook.
+ */
+user.form = function(forms, callback) {
+
+  // Dynamic sign-in form.
+  var element;
+
+  if (this.settings.emailLogin) {
+    element = {
+      name: 'email',
+      placeholder: 'Email',
+      type: 'email',
+      required: true,
+      weight: 0
+    };
+  }
+  else {
+    element = {
+      name: 'username',
+      placeholder: 'Username',
+      type: 'text',
+      required: true,
+      weight: 0
+    }
+  }
+
+  forms['sign-in'].elements.push(element);
+
+  if (!this.settings.emailAsUsername) {
+
+    forms['create-account'].elements.push({
+      name: 'username',
+      title: 'Choose your username',
+      type: 'text',
+      required: true,
+      weight: 0
+    });
+
+    forms['edit-account'].elements.push({
+      name: 'username',
+      title: 'Username',
+      type: 'text',
+      required: true,
+      weight: -15
+    });
+  }
+
+  callback();
+}

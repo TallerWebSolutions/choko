@@ -14,7 +14,6 @@ angular.module('choko')
     };
   }])
 
-  // Directive to replace any tag with overridable templates from the server.
   .directive('ckReplace', ['$http', '$compile', function($http, $compile) {
     return {
       restrict: 'EA',

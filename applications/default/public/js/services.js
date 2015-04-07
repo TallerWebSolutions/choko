@@ -10,7 +10,6 @@ angular.module('choko')
   // Single value service for Choko version.
   .value('version', '0.0.1')
 
-  // Choko main REST factory.
   .factory('Choko', ['$resource', function($resource) {
     return $resource('/rest/:type/:key', {
       type: '@type',
@@ -34,6 +33,20 @@ angular.module('choko')
       },
       set: function(newState) {
         return state = newState;
+      }
+    };
+  }])
+
+  // Token strings contain embedded parameters that can be replaced.
+  .factory('Token', ['Params', function(Params) {
+    var pattern = /\[(.*?)\]/g;
+
+    return {
+      replace: function(params, scope) {
+        var replaced = params.replace(pattern, function(match, subMatch) {
+          return Params.parse(subMatch, scope);
+        });
+        return replaced;
       }
     };
   }])

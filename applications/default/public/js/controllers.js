@@ -204,7 +204,12 @@ angular.module('choko')
         $scope.buildForm();
       }
 
-      $scope.submit = function(url, redirect) {
+      $scope.submit = function(url) {
+
+        // Replace tokens in url.
+        if (url) {
+          url = Token.replace(url, $scope);
+        }
 
         // Add params to data if any.
         Object.keys($scope.view.params || {}).forEach(function(param) {

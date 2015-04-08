@@ -455,7 +455,9 @@ user.route = function(routes, callback) {
       var User = application.type('user');
       User.load(request.user.username, function(error, account) {
         utils.extend(account, data);
-        User.validateAndSave(account, function(error, account, errors) {
+        delete account.password;
+
+        User.validateAndSave(account, ['username', 'email'], function(error, account, errors) {
           if (error) {
             return callback(error);
           }

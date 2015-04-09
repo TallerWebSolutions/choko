@@ -303,6 +303,10 @@ user.type = function(types, callback) {
     }
   };
 
+  if (this.settings.emailAsUsername) {
+    delete newTypes['user'].fields['username'];
+  }
+
   newTypes['role'] = {
     title: 'Role',
     description: 'User roles.',
@@ -429,24 +433,10 @@ user.route = function(routes, callback) {
       var data = request.body;
       var fieldName = self.settings.emailAsUsername ? 'email' : 'username';
 
-      if(fieldName === 'email') {
-        data.username = data.email;
-      }
-
-      if (!(fieldName in data)) {
-        return callback(null, [self.messages('provide-field')], 400);
-      }
-
-      // @todo commented this out as this was breking some tests, need to
-      // refactor tests when we fix this for validating the user instance
-      // itself with validateAndSave().
-      //if (!('username' in data)) {
-      //  return callback(null, ['Please provide an username.'], 400);
-      //}
-
       var User = application.type('user');
       var query = {};
 
+      // Construct query.
       query[fieldName] = data[fieldName];
 
       User.load(query, function(error, account) {
@@ -506,7 +496,6 @@ user.route = function(routes, callback) {
       var User = application.type('user');
 
       if (self.settings.emailAsUsername) {
-        data.username = data.email;
         validateFields.shift();
       }
 
@@ -790,7 +779,6 @@ user.messages = function(name) {
   messages['invalid'] = 'Invalid ' + loginFieldName + ' or password.';
 
   messages['not-available'] = 'This ' + accountFieldName + ' is not available, please choose another one.';
-  messages['provide-field'] = 'Please provide an ' + accountFieldName  + '.';
 
   return messages[name];
 };

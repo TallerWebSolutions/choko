@@ -258,6 +258,8 @@ user.type = function(types, callback) {
         var User = this;
         var query = {};
         var name = self.settings.emailLogin ? 'email' : 'username';
+
+        // Build query.
         query[name] = data[name];
 
         this.load(query, function(error, account) {
@@ -437,7 +439,7 @@ user.route = function(routes, callback) {
       var User = application.type('user');
       var query = {};
 
-      // Construct query.
+      // Build query.
       query[fieldName] = data[fieldName];
 
       User.load(query, function(error, account) {
@@ -482,7 +484,7 @@ user.route = function(routes, callback) {
     }
   };
 
-  newRoutes['/settings/edit-account-submit/:id*'] = {
+  newRoutes['/settings/edit-account-submit/:id'] = {
     access: 'edit-own-account',
     callback: function(request, response, callback) {
       var data = request.body;

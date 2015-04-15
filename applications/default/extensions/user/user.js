@@ -230,9 +230,9 @@ user.type = function(types, callback) {
       },
       'list-group-item': {
         'heading': [{
-          fieldName: 'username',
+          fieldName: self.settings.emailAsUsername ? 'email' : 'username',
           format: 'title',
-          link: '/manage/users/edit/[username|item]',
+          link: '/manage/users/edit/[:id|item]',
           weight: 0
         }],
         'text': [{
@@ -303,6 +303,7 @@ user.type = function(types, callback) {
     }
   };
 
+  // Remove username field when emailAsUsername mode is enable.
   if (this.settings.emailAsUsername) {
     delete newTypes['user'].fields['username'];
   }
@@ -829,6 +830,18 @@ user.form = function(forms, callback) {
       required: true,
       weight: -15
     });
+  }
+
+  callback();
+}
+
+/**
+ * The navigation() hook.
+ */
+user.navigation = function(navigations, callback) {
+
+  if (this.settings.emailAsUsername) {
+    navigations['user-links'].items[0].title = ':email|user';
   }
 
   callback();

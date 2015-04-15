@@ -53,7 +53,7 @@
   "keyProperty": "id",
   "storage": "database",
   "access": {
-    "list": "manage-content",
+    "list": true,
     "load": "manage-content",
     "add": "manage-content",
     "edit": "manage-content",

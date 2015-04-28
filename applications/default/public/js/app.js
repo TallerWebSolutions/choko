@@ -55,9 +55,12 @@ angular.module('choko', dependencies)
           });
 
           extractedData = temp;
+
         } else if (operation === 'put') {
           extractedData = data;
           extractedData.updated = true;
+        } else if (operation === 'remove') {
+          extractedData = data[0];
         } else {
           extractedData = data;
         }

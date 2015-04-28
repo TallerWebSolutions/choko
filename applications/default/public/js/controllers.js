@@ -62,6 +62,24 @@ angular.module('choko')
 .controller('ItemController', ['$scope',
   function($scope) {
 
+    // Verify if exist items and item objects.
+    if ($scope.items && $scope.item) {
+
+      // Method to delete current element from items array.
+      $scope.delete = function() {
+
+        // Expose removingItem promise into the $scope.
+        var removingItem = $scope.removingItem = $scope.item.remove();
+
+        removingItem.then(function(removedItem) {
+          $scope.items.forEach(function(item, index) {
+            if (item.id === removedItem.id) {
+              $scope.items.splice(index, 1);
+            }
+          });
+        });
+      };
+    }
   }
 ])
 

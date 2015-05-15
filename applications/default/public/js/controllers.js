@@ -155,16 +155,14 @@ angular.module('choko')
 
     // Handle 'item' type views.
     if ($scope.view.type === 'item' && $scope.view.itemType) {
-
       $scope.data = {};
-      $scope.view.title = '';
 
       // Expose view item promise to scope
       $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get();
 
       $scope.viewItem.then(function(response) {
         $scope.data = response;
-        $scope.view.title = response.title;
+        $scope.view.title = response.title || $scope.view.title;
       }, function(response) {
         // Error.
         if ($scope.page) {
@@ -240,9 +238,18 @@ angular.module('choko')
           if (url) {
             $scope.viewForm = Restangular.oneUrl('url', url).post('', $scope.data);
           } else {
-            $scope.viewForm = typeForm === 'post' ?
-              itemTypeREST.post($scope.data) :
-              $scope.data.put();
+
+            if (typeForm === 'post') {
+              $scope.viewForm = itemTypeREST.post($scope.data);
+            } else {
+
+              // Verify if the keyProperty field have the same itemKey value.
+              if ($scope.data.id !== $scope.view.itemKey) {
+                $scope.data.id = $scope.view.itemKey;
+              }
+
+              $scope.viewForm = $scope.data.put();
+            }
           }
         }
 

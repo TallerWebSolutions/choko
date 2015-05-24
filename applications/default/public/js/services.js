@@ -101,6 +101,13 @@ angular.module('choko')
       }
     });
 
+    // Register data properties parser.
+    this.addParser('data', function () {
+      return function (param, $scope) {
+        return $scope.data && $scope.data[param] || null;
+      }
+    });
+
     // Factory.
     this.$get = function ($injector) {
 

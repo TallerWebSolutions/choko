@@ -113,6 +113,15 @@ angular.module('choko')
 
     // Handle 'list' type views.
     if ($scope.view.type === 'list' && $scope.view.itemType) {
+
+      $scope.$on($scope.view.itemType+'List', function(event, param) {
+
+        // Verify if param is a function to execute.
+        if (params && angular.isFunction(param)) {
+          param.call(this, $scope, $scope.item);
+        }
+      });
+
       var query = {};
 
       if ($scope.view.query) {
@@ -161,8 +170,8 @@ angular.module('choko')
       $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get();
 
       $scope.viewItem.then(function(response) {
-        $scope.data = response;
-        $scope.view.title = response.title || $scope.view.title;
+        $scope.data = response || {};
+        $scope.view.title = $scope.data.title || $scope.view.title;
       }, function(response) {
         // Error.
         if ($scope.page) {

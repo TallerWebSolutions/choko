@@ -117,7 +117,7 @@ angular.module('choko')
       $scope.$on($scope.view.itemType+'List', function(event, param) {
 
         // Verify if param is a function to execute.
-        if (params && angular.isFunction(param)) {
+        if (param && angular.isFunction(param)) {
           param.call(this, $scope, $scope.item);
         }
       });

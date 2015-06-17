@@ -3,7 +3,7 @@ var Reflux = require("reflux");
 
 var toCamelCase = require("to-camel-case");
 
-var RefluxMixin = require("./Reflux.js");
+var RefluxMixin = require("./ChokoReflux.js");
 
 var connectStoresToLocalState = function (listenableNames) {
   /*  connectStoresToLocalState can be called in three ways:

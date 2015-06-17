@@ -34,6 +34,7 @@
     "path-to-regexp": "0.1.x",
     "prana": "0.1.x",
     "react": "^0.12.2",
+    "react-bootstrap": "skratchdot/react-bootstrap#442ef68ce2cbee90006839bf774adf20b9329293",
     "react-document-title": "^1.0.2",
     "react-router": "^0.12.4",
     "reflux": "^0.2.7",

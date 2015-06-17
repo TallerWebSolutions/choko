@@ -3,6 +3,8 @@ var lodash = require('lodash');
 
 var connectStoresToLocalState = require('../mixins/connectStoresToLocalState.js');
 
+var RowLayout = require('./RowLayout.jsx');
+
 var LayoutComponent = React.createClass({
   mixins: [connectStoresToLocalState(['Layout', 'Panels'])],
   getInitialState: function() {
@@ -10,7 +12,7 @@ var LayoutComponent = React.createClass({
   },
   render: function () {
 
-    var RowLayout = this.requireComponent('RowLayout');
+    // var RowLayout = this.requireComponent('RowLayout');
 
     return (
       <div className="Layout">

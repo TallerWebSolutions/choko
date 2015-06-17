@@ -4,13 +4,11 @@ var lodash = require('lodash');
 // var {RouteHandler} = Router;
 
 // var connectStoresToLocalState = require('../mixins/connectStoresToLocalState.js');
-var RefluxMixin = require("../mixins/Reflux.js");
 
 var RegionLayout = require('./RegionLayout.jsx');
 var RowLayout = require('./RowLayout.jsx');
 
 var ColumnLayoutComponent = React.createClass({
-  mixins: [RefluxMixin],
   getDefaultProps: function () {
     return {
       "column": []

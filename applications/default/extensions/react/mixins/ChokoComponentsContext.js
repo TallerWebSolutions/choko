@@ -7,7 +7,7 @@ var ChokoComponentsContextMixin = {
     "chokoComponents": React.PropTypes.object.isRequired,
   },
 
-  "childContextTypes": RefluxMixin.contextTypes,
+  "childContextTypes": ChokoComponentsMixin.contextTypes,
 
   "getChildContext": function () {
     return {

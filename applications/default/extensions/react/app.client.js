@@ -15,7 +15,7 @@ var initialRenderComplete = false;
 
 var ReactApp = function (args, callback) {
 
-  var container = document.querySelector('html');
+  var container = document;
 
   if (!container) {
     return initialRenderComplete = false;

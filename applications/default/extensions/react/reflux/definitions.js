@@ -2,7 +2,8 @@ var lodash = require('lodash');
 
 module.exports = lodash(
   [
-    // "Application",
+    "Application",
+    "Routes",
     "Contexts",
     "Layout",
     "Page",

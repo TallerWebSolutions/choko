@@ -3,7 +3,7 @@ var lodash = require("lodash");
 var Application = {
 
   actions: [
-    '',
+    'getSettings',
   ],
 
   store: {
@@ -11,18 +11,11 @@ var Application = {
       this.state = {};
     },
 
-    onTransitionToPage: function (url) {
-      this.articleID = articleID;
-
-      if (!lodash(this.state.uuid).isEmpty() && this.state.uuid != articleID) {
-        this.state = {};
-      }
-
-      
+    onGetSettings: function () {
+      this.state = {};
       this.trigger(this.state);
-    },
-  },
-  
+    }
+  }
 };
 
 module.exports = Application;

@@ -1,9 +1,45 @@
 var lodash = require('lodash');
 var ReactHook = module.exports;
 var ReactApp = require('./app.server.js');
+var Webpack = require("webpack");
+var path = require('path');
 
 // @TODO: Create "type" for reflux definitions for extensions to use.
-var refluxDefinitions = require('./reflux/definitions.js')
+var refluxDefinitions = require('./reflux/definitions.js');
+
+var createWebpackSettings = require('./webpack/createSettings.js');
+
+/**
+ * Hook init();
+ */
+ReactHook.init = function (app, callback) {
+
+  app.settings.bundlesPath = path.join(app.settings.applicationDir, 'public/bundles');
+  // @TODO: Make this an array getting from the entrys.
+  app.settings.bundlesPublicPath = '/bundles/app.js';
+
+  var webpackSettings = createWebpackSettings({
+    baseDir: app.settings.baseDir,
+    entry: {
+      app: './app.client.js'
+    },
+    output: {
+      path: app.settings.bundlesPath
+    },
+    constants: {
+      'CHOKO_ON_BROWSER': true
+    }
+  });
+
+  var webpack = Webpack(webpackSettings);
+  webpack.run(function (error, stats) {
+
+    console.log(stats.toJson(), 'haaaa');
+
+    callback();
+  });
+
+};
 
 /**
  * Hook response();
@@ -28,11 +64,19 @@ ReactHook.response = function (payload, request, response, callback) {
       if (current_route.router === 'page') {
         if (request.accepts(['json', 'html']) === 'html') {
 
+          var dehydratedState = lodash.merge(payload.data, {
+            routes: pagePaths,
+            application: {
+              settings: self.application.settings
+            }
+          });
+
           var argsApp = {
             requestUrl:        request.url,
-            dehydratedState:   payload.data,
+            dehydratedState:   dehydratedState,
             pagePaths:         pagePaths,
-            refluxDefinitions: refluxDefinitions
+            refluxDefinitions: refluxDefinitions,
+            chokoSettings:     self.application.settings
           }
 
           ReactApp(argsApp, function (output) {

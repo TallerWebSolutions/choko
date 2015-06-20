@@ -60,7 +60,7 @@ var HtmlComponent = React.createClass({
 
       {/* @TODO: Dehydrated data must be equal to the response from the rest. */}
       <script dangerouslySetInnerHTML={{
-        __html: `window.__chokoStoreStateByName = ${ JSON.stringify( this.context.chokoReflux.dehydrate() ) }`
+        __html: `window.__chokoState = ${ JSON.stringify( this.context.chokoReflux.dehydrate() ) }`
       }}/>
 
       { scriptTag }

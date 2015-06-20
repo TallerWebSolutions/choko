@@ -23,8 +23,8 @@ var ColumnLayoutComponent = React.createClass({
         }
 
         {column.hasOwnProperty('rows') &&
-          lodash.map(column.rows, row =>
-            <RowLayout row={row} />
+          lodash.map(column.rows, (row, key) =>
+            <RowLayout key={key} row={row} />
           )
         }
         

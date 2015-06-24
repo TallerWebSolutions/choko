@@ -1,6 +1,6 @@
 var lodash = require('lodash');
 
-module.exports = lodash(
+var Stores = lodash.map(
   [
     "Application",
     "Routes",
@@ -9,7 +9,8 @@ module.exports = lodash(
     "Page",
     "Panels",
     "Theme"
-  ]
-).map(
+  ],
   key => [key, require(`./${ key }.js`)]
-).zipObject().__wrapped__;
+);
+
+module.exports = lodash.zipObject(Stores);

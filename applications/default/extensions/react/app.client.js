@@ -33,7 +33,7 @@ var ReactApp = function (args, callback) {
   var pagePaths = refluxApp.stores['Routes'].state;
 
   // Create a react route for every implemented page.
-  var pageRoutes = lodash(pagePaths).map(function (path) {
+  var pageRoutes = lodash.map(pagePaths, path => {
     return <Route path={path} handler={PageComponent} />
   });
 

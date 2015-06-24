@@ -188,7 +188,8 @@ navigation.panel = function(panels, callback) {
         classes: nav.classes,
         itemType: 'navigation',
         itemKey: navigationName,
-        template: nav.template || '/templates/navigation.html'
+        template: nav.template || '/templates/navigation.html',
+        navigation: nav
       };
 
       next();

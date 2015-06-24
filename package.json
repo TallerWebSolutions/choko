@@ -22,7 +22,7 @@
     "harmony": "0.0.1",
     "isomorphic-reflux": "TallerWebSolutions/isomorphic-reflux#taller",
     "jsx-loader": "^0.13.2",
-    "lodash": "2.x.x",
+    "lodash": "3.x.x",
     "method-override": "2.1.x",
     "mkdirp": "0.3.x",
     "multer": "0.1.x",

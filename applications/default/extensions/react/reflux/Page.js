@@ -1,5 +1,3 @@
-var lodash = require("lodash");
-
 var Page = {
 
   "actions": [

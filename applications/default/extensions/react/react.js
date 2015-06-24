@@ -34,7 +34,7 @@ ReactHook.init = function (app, callback) {
   var webpack = Webpack(webpackSettings);
   webpack.run(function (error, stats) {
 
-    console.log(stats.toJson(), 'haaaa');
+    // console.log(stats.toJson(), 'haaaa');
 
     callback();
   });
@@ -88,6 +88,19 @@ ReactHook.response = function (payload, request, response, callback) {
           response.status(payload.status.code).send(payload);
         }
       }
+      else {
+        // Bypass if isn't a page.
+        callback();
+      }
     });
   });
+};
+
+ReactHook.panels = function (panels, callback) {
+  lodash.map(panels, function (panel) {
+    if (lodash.startsWith(panel.name, 'navigation-')) {
+      panel.component = 'Navigation';
+    }
+  });
+  callback();
 };

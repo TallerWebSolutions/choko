@@ -24,8 +24,7 @@ module.exports = function (args, callback) {
   var refluxApp = new Reflux(refluxDefinitions);
 
   // @TODO: Dehydrate stores should be a method of the Relfux App.
-  lodash(refluxApp.stores).each(function (store, name) {
-
+  lodash.each(refluxApp.stores, (store, name) => {
     store.state = dehydratedState[name.toLowerCase()];
   });
 
@@ -36,7 +35,7 @@ module.exports = function (args, callback) {
   });
 
   // Create a react route for every implemented page.
-  var pageRoutes = lodash(pagePaths).map(function (path) {
+  var pageRoutes = lodash.map(pagePaths, path => {
     return <Route path={path} handler={PageComponent} />
   });
 

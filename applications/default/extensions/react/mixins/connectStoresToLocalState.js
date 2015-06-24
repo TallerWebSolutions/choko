@@ -25,32 +25,29 @@ var connectStoresToLocalState = function (listenableNames) {
   console.assert(arguments.length > 0, "connectStoresToLocalState needs to know which stores to connect.");
 
   if (arguments.length == 2) {
-    listenableNames = lodash([arguments]).zipObject().__wrapped__;
-
-  } else if (listenableNames.constructor === String) {
+    listenableNames = lodash.zipObject([arguments]);
+  }
+  else if (listenableNames.constructor === String) {
     listenableNames = [listenableNames];
   }
 
   if (Array.isArray(listenableNames)) {
-    listenableNames = lodash(listenableNames).map(
-      storeName => [storeName, toCamelCase(storeName)]
-    ).zipObject().__wrapped__;
+    listenableNames = lodash.map(listenableNames, storeName => [storeName, toCamelCase(storeName)]);
+    listenableNames = lodash.zipObject(listenableNames);
   }
 
   // Heavily inspired by Reflux.connect: https://github.com/spoike/refluxjs/blob/master/src/connect.js
   return Object.assign(
     {
       "getInitialState": function () {
-        return lodash(listenableNames).map(
-          (componentStateKeyName, storeName) => {
-            return [componentStateKeyName, this.getRefluxStore(storeName).state]
-          }
-        ).zipObject().__wrapped__;
+        var names = lodash.map(listenableNames, (componentStateKeyName, storeName) => {
+          return [componentStateKeyName, this.getRefluxStore(storeName).state]
+        });
+        return lodash.zipObject(names);
       },
 
       "componentDidMount": function () {
-        lodash(listenableNames).each(
-          (componentStateKeyName, storeName) => {
+        lodash.each(listenableNames, (componentStateKeyName, storeName) => {
             this.listenTo(
               this.getRefluxStore(storeName),
 

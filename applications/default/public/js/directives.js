@@ -22,13 +22,25 @@ angular.module('choko')
       // we run it previously to most other directives, to avoid dumb processing.
       priority: 100,
       compile: function(element, attrs) {
-        return function(scope, element, attrs) {
-          var templateUrl = '/templates/';
-          scope.element.isSubform = attrs.subForm ? true : false;
-          scope.element.template = scope.element.template || templateUrl + scope.element.type + '.html';
-          $http({method: 'GET', url: scope.element.template, cache: true}).then(function(result) {
-            var template = angular.element($compile(result.data)(scope));
-            element.replaceWith(template);
+         return function(scope, element, attrs) {
+
+          // Request the template content.
+          var loadTemplate = $http({
+            method: 'GET',
+            // If the directive is an element, "src" should be available.
+            url: attrs.ckReplace || attrs.src,
+            cache: true
+          });
+
+          // When ready, compile the retrieved template.
+          loadTemplate.then(function(result) {
+
+            // Compile the returned template.
+            var compiled = $compile(result.data)(scope);
+
+            // Replace old element with compiled one.
+            element.replaceWith(angular.element(compiled));
+
           });
         };
       }
@@ -88,6 +100,7 @@ angular.module('choko')
           // Allow for custom templates but fallback to default one based
           // on element type.
           scope.element.template = scope.element.template || '/templates/' + scope.element.type + '.html';
+          scope.element.isSubform = attrs.subForm ? true : false;
 
           // Append the ck-replace directive.
           element.attr('ck-replace', scope.element.template);
@@ -101,8 +114,7 @@ angular.module('choko')
   // Handles button or button groups for navigation bars.
   // @todo This directive is specifically used by the navigation extension.
   //       Therefore it should be moved to this extension's directory.
-
-  .directive('ckButtonOld', ['ckReplaceAndRecompile', function(ckReplaceAndRecompile) {
+  .directive('ckButton', ['ckReplaceAndRecompile', function(ckReplaceAndRecompile) {
     return {
       restrict: 'EA',
       scope: true,
@@ -121,32 +133,15 @@ angular.module('choko')
             scope.item.classes.push('btn-default');
           }
 
-          // @todo: we should probably allow for custom templates, as we do in
-          // ckReplaceElement directive above.
-          var template = scope.item.items ? '/templates/btn-group-dropdown.html' : '/templates/btn-group-button.html';
+          // Allow for custom templates but fallback to default
+          if (!scope.item.template) {
+            scope.item.template = scope.item.items ? '/templates/btn-group-dropdown.html' : '/templates/btn-group-button.html';
+          }
 
           // Append the replacement directive.
-          element.attr('ck-replace', template);
+          element.attr('ck-replace', scope.item.template);
 
           ckReplaceAndRecompile(element, ['ck-button', 'ng-repeat'], scope);
-        };
-      }
-    };
-  }])
-
-  .directive('ckButton', ['$http', '$compile', function($http, $compile) {
-    return {
-      restrict: 'E',
-      scope: true,
-      compile: function(element, attrs) {
-        return function(scope, element, attrs) {
-          var template = scope.item.items ? '/templates/btn-group-dropdown.html' : '/templates/btn-group-button.html';
-          scope.item.classes = scope.item.classes || ['btn-default'];
-
-          $http({method: 'GET', url: template, cache: true}).then(function(result) {
-            var template = angular.element($compile(result.data)(scope));
-            element.replaceWith(template);
-          });
         };
       }
     };

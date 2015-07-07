@@ -83,8 +83,8 @@ angular.module('choko')
   }
 ])
 
-.controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params', 'Token',
-  function($scope, $location, $http, Choko, Restangular, Params, Token) {
+.controller('ViewController', ['$scope', '$location', '$http', '$controller', 'Choko', 'Restangular', 'Params', 'Token',
+  function($scope, $location, $http, $controller, Choko, Restangular, Params, Token) {
 
     // Prevente creation of service if no itemType set.
     if ($scope.view.itemType) {
@@ -281,6 +281,13 @@ angular.module('choko')
           $scope.status = response.status;
         });
       };
+    }
+
+    // Inherit controller.
+    if ($scope.view.extendController) {
+      $controller($scope.view.extendController, {
+        $scope: $scope
+      });
     }
   }
 ]);

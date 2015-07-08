@@ -101,6 +101,13 @@ angular.module('choko')
       }
     });
 
+    // Register items properties parser.
+    this.addParser('items', function () {
+      return function (param, $scope) {
+        return $scope.items && $scope.items[param] || null;
+      }
+    });
+
     // Register data properties parser.
     this.addParser('data', function () {
       return function (param, $scope) {

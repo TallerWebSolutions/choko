@@ -1,3 +1,5 @@
+var fs = require('fs');
+var path = require('path');
 var lodash = require('lodash');
 var Reflux = require('isomorphic-reflux');
 var React = require('react');
@@ -7,11 +9,10 @@ var {Route, DefaultRoute, NotFoundRoute, RouteHandler} = Router;
 
 // Basic components.
 var AppComponent = require('./components/App.jsx');
-var HtmlComponent = require('./components/Html.jsx');
+var HtmlHeadComponent = require('./components/HtmlHead.jsx');
+var HtmlBodyComponent = require('./components/HtmlBody.jsx');
 var PageComponent = require('./components/Page.jsx');
 
-// @TODO: Move things for server/client specific to the
-//        files app.client.js or app.server.js. 
 module.exports = function (args, callback) {
   var {
     requestUrl,
@@ -34,16 +35,14 @@ module.exports = function (args, callback) {
     }
   });
 
-  // Create a react route for every implemented page.
-  var pageRoutes = lodash.map(pagePaths, path => {
-    return <Route path={path} handler={PageComponent} />
-  });
-
   var reactRoutes = (
     <Route path="/" handler={AppComponent}>
-      <Route handler={HtmlComponent}>
-
-        { pageRoutes }
+      <Route handler={HtmlBodyComponent}>
+        
+        // Create a react route for every implemented page.
+        {lodash.map(pagePaths, path => {
+          return <Route key={path} path={path} handler={PageComponent} />
+        })}
 
         <NotFoundRoute handler={NotFound}/>
       </Route>
@@ -53,9 +52,32 @@ module.exports = function (args, callback) {
   Router.run(reactRoutes, requestUrl, function (Handler, state) {
     // var title  = DocumentTitle.rewind();
 
-    var output = React.renderToString(<Handler reflux={refluxApp} settings={chokoSettings} />);
-    output = "<!DOCTYPE html>" + output;
+    // @TODO: Extensions could want to override the app.html file.
+    // @TODO: Reduce io operations with a cache in memory of the fileString.
+    fs.readFile(path.resolve(__dirname, './app.html'), 'utf8', function (error, fileString) {
 
-    callback(output);
+      if (error) {
+        return console.log(error);
+      }
+      
+      var htmlHeadProps = {
+        favIconSrc: 'favicon.ico',
+        title: 'Change this title.'
+        // styles: [{src: chokoSettings.bundlesPublicPath + '/styles.js'}],
+      };
+
+      // Render the app's head tag.
+      var headRendered = React.renderToString(<HtmlHeadComponent {...htmlHeadProps} />);
+      // Render the app, which is the content of body tag.
+      var bodyRendered = React.renderToString(<Handler reflux={refluxApp} />);
+
+      // Replace tokens with rendered data.
+      var output = fileString
+      .replace(/\$\{HEAD_TAGS\}/g, headRendered)
+      .replace(/\$\{BODY_TAGS\}/g, bodyRendered);
+
+      callback(output);
+    });
+  
   });
 };

@@ -19,7 +19,9 @@ function getSettings (options) {
         "",
         ".js",
         ".jsx",
-        ".scss"
+        ".scss",
+        ".sass",
+        ".css"
       ]
     },
  
@@ -29,10 +31,18 @@ function getSettings (options) {
           "test":   /\.js(x)?$/,
           "loader": "jsx-loader?harmony"
         },
-        // {
-        //   "test":   /\.scss$/,
-        //   "loader": "style-loader!css-loader!autoprefixer-loader!sass-loader"
-        // },
+        {
+          "test":   /\.css$/,
+          "loader": "style-loader!css-loader!autoprefixer-loader"
+        },
+        {
+          "test":   /\.scss$/,
+          "loader": "style-loader!css-loader!autoprefixer-loader!sass-loader"
+        },
+        {
+          "test":   /\.sass$/,
+          "loader": "style-loader!css-loader!autoprefixer-loader!sass-loader"
+        }
       ]
     },
  
@@ -47,7 +57,7 @@ function getSettings (options) {
     "plugins": [
       new Webpack.optimize.DedupePlugin(),
       new Webpack.optimize.OccurenceOrderPlugin(),
-    ],
+    ]
   };
  
   // `settings.context` tells Webpack where to look up its relative paths.

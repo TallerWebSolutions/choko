@@ -4,18 +4,19 @@ var React = require('react');
 var ReactRouter = require('react-router');
 var {Route, DefaultRoute, NotFoundRoute, RouteHandler} = ReactRouter;
 var refluxDefinitions = require('./reflux/definitions.js');
+var path = require('path');
 // var DocumentTitle = require('react-document-title');
 
 // Basic components.
 var AppComponent = require('./components/App.jsx');
-var HtmlComponent = require('./components/Html.jsx');
+var HtmlBodyComponent = require('./components/HtmlBody.jsx');
 var PageComponent = require('./components/Page.jsx');
 
 var initialRenderComplete = false;
 
-var ReactApp = function (args, callback) {
+var ReactAppClient = function () {
 
-  var container = document;
+  var container = document.getElementById('ChokoApp');
 
   if (!container) {
     return initialRenderComplete = false;
@@ -32,16 +33,14 @@ var ReactApp = function (args, callback) {
 
   var pagePaths = refluxApp.stores['Routes'].state;
 
-  // Create a react route for every implemented page.
-  var pageRoutes = lodash.map(pagePaths, path => {
-    return <Route path={path} handler={PageComponent} />
-  });
-
   var reactRoutes = (
     <Route path="/" handler={AppComponent}>
-      <Route handler={HtmlComponent}>
+      <Route handler={HtmlBodyComponent}>
 
-        { pageRoutes }
+        // Create a react route for every implemented page.
+        {lodash.map(pagePaths, path => {
+          return <Route key={path} path={path} handler={PageComponent} />
+        })}
 
         <NotFoundRoute handler={NotFound}/>
       </Route>
@@ -56,19 +55,21 @@ var ReactApp = function (args, callback) {
     // }
   });
 
-  var chokoSettings = refluxApp.stores['Application'].state.settings;
+  // @TODO: Load css with react.
+  // var styleSheets = refluxApp.stores['Theme'].state.styles;
+  // require('../../public' + styleSheets[0]);
 
   Router.run(function (Handler, state) {
 
-    React.render(<Handler reflux={refluxApp} settings={chokoSettings} />, container);
+    React.render(<Handler reflux={refluxApp} />, container);
   });
 
   return initialRenderComplete = true;
 };
 
-if (!ReactApp()) {
+if (!ReactAppClient()) {
   window.addEventListener(
     "DOMContentLoaded",
-    ReactApp
+    ReactAppClient
   );
 }

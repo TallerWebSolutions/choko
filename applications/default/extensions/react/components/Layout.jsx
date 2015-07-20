@@ -17,7 +17,7 @@ var LayoutComponent = React.createClass({
     return (
       <div className="Layout">
         {lodash.map(this.state.layout.rows, row =>
-          <RowLayout row={row} />
+          <RowLayout key={row.name} row={row} />
         )}
       </div>
     );

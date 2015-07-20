@@ -25,7 +25,7 @@ var RegionLayoutComponent = React.createClass({
 
         {regionExist &&
           lodash.map(this.state.panels[regionName], panel =>
-            <Panel panel={panel} />
+            <Panel key={panel.name} panel={panel} />
           )
         }
         

@@ -13,18 +13,23 @@ var createWebpackSettings = require('./webpack/createSettings.js');
  * Hook init();
  */
 ReactHook.init = function (app, callback) {
-
-  app.settings.bundlesPath = path.join(app.settings.applicationDir, 'public/bundles');
   // @TODO: Make this an array getting from the entrys.
-  app.settings.bundlesPublicPath = '/bundles/app.js';
+  app.settings.webpack = {
+    publicDirUrl: '/bundles',
+    entry: [
+      {app: './app.client.js'}
+    ]
+  };
+
+  // Public path to the app bundle.
+  app.settings.webpack.bundleUrl = path.join(app.settings.webpack.publicDirUrl, 'app.js');
 
   var webpackSettings = createWebpackSettings({
     baseDir: app.settings.baseDir,
-    entry: {
-      app: './app.client.js'
-    },
+    // @TODO: Allow multiple entries.
+    entry: app.settings.webpack.entry[0],
     output: {
-      path: app.settings.bundlesPath
+      path: path.join(app.settings.applicationDir, 'public/bundles')
     },
     constants: {
       'CHOKO_ON_BROWSER': true
@@ -64,19 +69,24 @@ ReactHook.response = function (payload, request, response, callback) {
       if (current_route.router === 'page') {
         if (request.accepts(['json', 'html']) === 'html') {
 
+          var chokoSettings = {
+            bundleUrl: self.application.settings.webpack.bundleUrl
+          };
+
           var dehydratedState = lodash.merge(payload.data, {
             routes: pagePaths,
             application: {
-              settings: self.application.settings
+              settings: chokoSettings
             }
           });
 
+          // @TODO: It should be less verbose.
           var argsApp = {
             requestUrl:        request.url,
             dehydratedState:   dehydratedState,
             pagePaths:         pagePaths,
             refluxDefinitions: refluxDefinitions,
-            chokoSettings:     self.application.settings
+            chokoSettings:     chokoSettings
           }
 
           ReactApp(argsApp, function (output) {

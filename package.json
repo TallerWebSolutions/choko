@@ -36,6 +36,7 @@
     "path-to-regexp": "0.1.x",
     "prana": "0.1.x",
     "react": "^0.13.3",
+    "react-bootstrap": "^0.23.7",
     "react-document-title": "^1.0.2",
     "react-router": "^0.13.3",
     "reflux": "^0.2.7",

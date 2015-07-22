@@ -188,7 +188,9 @@ angular.module('choko')
       var typeForm = 'post';
       var itemREST = null;
 
+      $scope.viewForm;
       $scope.data = {};
+
       $scope.buildForm = function() {
         Choko.get({
           type: 'form',

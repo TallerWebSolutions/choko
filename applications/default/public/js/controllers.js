@@ -177,7 +177,7 @@ angular.module('choko')
         if ($scope.page) {
           // If it's a page, show error, otherwise fail silently.
           $scope.data = response.data;
-          $scope.view.title = response.data.title;
+          $scope.view.title = response.data.title || null;
           $scope.view.template = '/templates/error.html';
         }
       });

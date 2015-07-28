@@ -103,12 +103,12 @@ angular.module('choko')
       $scope: $scope
     });
 
-    // Parse query params.
+    // Parse query reference params.
     Object.keys($scope.element.reference.query || {}).forEach(function(param) {
       $scope.element.reference.query[param] = Params.parse($scope.element.reference.query[param], $scope);
     });
 
-    // Parse reference params.
+    // Parse other reference params.
     Object.keys($scope.element.reference.params || {}).forEach(function(param) {
       $scope.element.reference.params[param] = Params.parse($scope.element.reference.params[param], $scope);
     });
@@ -127,6 +127,7 @@ angular.module('choko')
 
     $scope.element.options.$promise.then(function(response) {
       $scope.element.options = response;
+
       // Use radios if less then 5 options.
       $scope.fewOptions = ($scope.element.options && Object.keys($scope.element.options).length <= 5);
     });

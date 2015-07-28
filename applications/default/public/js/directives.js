@@ -126,7 +126,6 @@ angular.module('choko')
       terminal: true,
       compile: function(element, attrs) {
         return function(scope, element, attrs) {
-
           // Add bootstrap button class.
           scope.item.classes = scope.item.classes || ['btn-default'];
 

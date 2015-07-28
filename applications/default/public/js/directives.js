@@ -128,10 +128,7 @@ angular.module('choko')
         return function(scope, element, attrs) {
 
           // Add bootstrap button class.
-          scope.item.classes = scope.item.classes || [];
-          if (scope.item.classes.indexOf('btn-default')+1) {
-            scope.item.classes.push('btn-default');
-          }
+          scope.item.classes = scope.item.classes || ['btn-default'];
 
           // Allow for custom templates but fallback to default
           if (!scope.item.template) {

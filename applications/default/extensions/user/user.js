@@ -643,7 +643,8 @@ user.role = function(routes, callback) {
     description: 'Anonymous, unauthenticated user.',
     permissions: [
       'create-account',
-      'sign-in'
+      'sign-in',
+      'view-content'
     ]
   };
 
@@ -654,7 +655,8 @@ user.role = function(routes, callback) {
     description: 'Authenticated, signed in user.',
     permissions: [
       'sign-out',
-      'edit-own-account'
+      'edit-own-account',
+      'view-content'
     ]
   };
 

@@ -259,7 +259,6 @@ user.type = function(types, callback) {
         var query = {};
         var name = self.settings.emailLogin ? 'email' : 'username';
 
-        // Build query.
         query[name] = data[name];
 
         this.load(query, function(error, account) {
@@ -435,7 +434,6 @@ user.route = function(routes, callback) {
     callback: function(request, response, callback) {
       var data = request.body;
       var fieldName = self.settings.emailAsUsername ? 'email' : 'username';
-
       var User = application.type('user');
       var query = {};
 
@@ -487,6 +485,12 @@ user.route = function(routes, callback) {
   newRoutes['/settings/edit-account-submit/:id'] = {
     access: 'edit-own-account',
     callback: function(request, response, callback) {
+      // @todo: figure out how to prevent form controller from sending the
+      // username.
+      if (request.user.id != request.params.id) {
+        return callback(null, ['Invalid user.'], 400);
+      }
+
       var data = request.body;
       var validateFields = ['username', 'email']
 
@@ -541,7 +545,7 @@ user.route = function(routes, callback) {
       }
 
       var User = application.type('user');
-      User.load({id: user.id}, function(error, account) {
+      User.load(user.id, function(error, account) {
         if (error) {
           return callback(error);
         }

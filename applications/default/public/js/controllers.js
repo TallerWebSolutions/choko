@@ -113,15 +113,6 @@ angular.module('choko')
 
     // Handle 'list' type views.
     if ($scope.view.type === 'list' && $scope.view.itemType) {
-
-      $scope.$on($scope.view.itemType+'List', function(event, param) {
-
-        // Verify if param is a function to execute.
-        if (param && angular.isFunction(param)) {
-          param.call(this, $scope, $scope.item);
-        }
-      });
-
       var query = {};
 
       if ($scope.view.query) {
@@ -160,6 +151,13 @@ angular.module('choko')
           }
         });
       }
+
+      $scope.$on($scope.view.itemType+'List', function(event, param) {
+        // Verify if param is a function to execute.
+        if (param && angular.isFunction(param)) {
+          param.call(this, $scope);
+        }
+      });
     }
 
     // Handle 'item' type views.
@@ -179,6 +177,13 @@ angular.module('choko')
           $scope.data = response.data;
           $scope.view.title = response.data.title || null;
           $scope.view.template = '/templates/error.html';
+        }
+      });
+
+      $scope.$on($scope.view.itemType+'Item:'+ $scope.view.itemKey, function(event, param) {
+        // Verify if param is a function to execute.
+        if (param && angular.isFunction(param)) {
+          param.call(this, $scope);
         }
       });
     }

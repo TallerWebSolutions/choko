@@ -12,8 +12,7 @@ var dependencies = [
   'summernote',
   'restangular',
   'angularFileUpload',
-  'ui.select',
-  'angularMoment'
+  'ui.select'
 ];
 
 // Declare main choko module.

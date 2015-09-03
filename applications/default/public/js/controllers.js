@@ -203,6 +203,11 @@ angular.module('choko')
         }, function(response) {
           $scope.form = response;
 
+          if ($scope.form.typeName) {
+            // Create a service for Itemtype.
+            itemTypeREST = Restangular.service($scope.form.typeName);
+          }
+
           if ($scope.form.mainTypeName) {
             $scope.data.type = $scope.form.shortName;
           }

@@ -234,7 +234,6 @@ panel.contextReactionType = function(reactionTypes, callback) {
       }
     },
     react: function(request, response, regionPanels, callback) {
-
       // Get panel type.
       var Panel = self.application.type('panel');
 
@@ -243,7 +242,6 @@ panel.contextReactionType = function(reactionTypes, callback) {
 
       // Add all panels to response payload.
       async.each(Object.keys(regionPanels), function(regionName, next) {
-
         // Initialize panels container if not initialized yet.
         response.payload.panels[regionName] = response.payload.panels[regionName] || [];
         var panels = regionPanels[regionName];

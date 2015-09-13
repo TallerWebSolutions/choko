@@ -29,10 +29,13 @@ user.init = function(application, callback) {
   var self = this;
 
   var authCallback = function(usernameOrEmail, password, callback) {
-    var data = {password: password};
-    data[(self.settings.emailLogin ? 'email' : 'username')] = usernameOrEmail;
+    var query = {
+      password: password
+    };
 
-    User.login(data, function (error, user) {
+    query[(self.settings.emailLogin ? 'email' : 'username')] = usernameOrEmail;
+
+    User.login(query, function (error, user) {
       if (error) {
         return callback(error);
       }
@@ -256,11 +259,11 @@ user.type = function(types, callback) {
       login: function(data, callback) {
 
         var User = this;
+        var fieldName = self.settings.emailLogin ? 'email' : 'username';
         var query = {};
-        var name = self.settings.emailLogin ? 'email' : 'username';
 
         // Build query.
-        query[name] = data[name];
+        query[fieldName] = data[fieldName];
 
         this.load(query, function(error, account) {
           if (error) {
@@ -434,9 +437,8 @@ user.route = function(routes, callback) {
     access: 'create-account',
     callback: function(request, response, callback) {
       var data = request.body;
-      var fieldName = self.settings.emailAsUsername ? 'email' : 'username';
-
       var User = application.type('user');
+      var fieldName = self.settings.emailAsUsername ? 'email' : 'username';
       var query = {};
 
       // Build query.
@@ -487,6 +489,12 @@ user.route = function(routes, callback) {
   newRoutes['/settings/edit-account-submit/:id'] = {
     access: 'edit-own-account',
     callback: function(request, response, callback) {
+      // @todo: figure out how to prevent form controller from sending the
+      // username.
+      if (request.user.id != request.params.id) {
+        return callback(null, ['Invalid user.'], 400);
+      }
+
       var data = request.body;
       var validateFields = ['username', 'email']
 
@@ -498,6 +506,7 @@ user.route = function(routes, callback) {
 
       var User = application.type('user');
 
+      // Remove username field.
       if (self.settings.emailAsUsername) {
         validateFields.shift();
       }
@@ -541,7 +550,7 @@ user.route = function(routes, callback) {
       }
 
       var User = application.type('user');
-      User.load({id: user.id}, function(error, account) {
+      User.load(user.id, function(error, account) {
         if (error) {
           return callback(error);
         }
@@ -625,6 +634,60 @@ user.route = function(routes, callback) {
         redirect: '/'
       });
     }
+  };
+
+  // Anonymous user object.
+  var anonymous = {
+    username: 'anonymous',
+    roles: ['anonymous']
+  };
+
+  newRoutes['/rest/user/sign-in'] = {
+    access: 'sign-in',
+    callback: function(request, response, callback) {
+      // Check if there are both an username and a password.
+      if (!request.body.username || !request.body.password) {
+        return callback(null, ['Please provide an username and a password.'], 400);
+      }
+      passport.authenticate('local', function(error, account, info) {
+        if (error) {
+          return callback(error);
+        }
+
+        if (!account) {
+          return callback(null, ['Invalid username or password.'], 401);
+        }
+
+        // Log user in.
+        request.login(account, function(error) {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, account);
+        });
+
+      })(request, response, callback);
+    },
+    router: 'rest'
+  };
+
+  newRoutes['/rest/user/current'] = {
+    middleware: passport.authenticate(['basic', 'anonymous']),
+    access: true,
+    callback: function(request, response, callback) {
+      callback(null, request.user || anonymous);
+    },
+    router: 'rest'
+  };
+
+  newRoutes['/rest/user/sign-out'] = {
+    access: 'sign-out',
+    callback: function(request, response, callback) {
+      // Log user out.
+      request.logout();
+      callback(null, anonymous);
+    },
+    router: 'rest'
   };
 
   callback(null, newRoutes);
@@ -782,7 +845,6 @@ user.messages = function(name) {
 
   messages['provide'] = 'Please provide an ' + loginFieldName + ' and a password.';
   messages['invalid'] = 'Invalid ' + loginFieldName + ' or password.';
-
   messages['not-available'] = 'This ' + accountFieldName + ' is not available, please choose another one.';
 
   return messages[name];
@@ -793,60 +855,38 @@ user.messages = function(name) {
  */
 user.form = function(forms, callback) {
 
-  // Dynamic sign-in form.
-  var element;
-
   if (this.settings.emailLogin) {
-    element = {
+    // Remove usename field to sign-in form.
+    forms['sign-in'].elements.splice(0, 1);
+
+    // Add email field to sign-in form.
+    forms['sign-in'].elements.push({
       name: 'email',
       placeholder: 'Email',
       type: 'email',
       required: true,
       weight: 0
-    };
-  }
-  else {
-    element = {
-      name: 'username',
-      placeholder: 'Username',
-      type: 'text',
-      required: true,
-      weight: 0
-    }
+    });
   }
 
-  forms['sign-in'].elements.push(element);
+  if (this.settings.emailAsUsername) {
+    // Remove username field to create-account form.
+    forms['create-account'].elements.splice(1, 1);
 
-  if (!this.settings.emailAsUsername) {
-
-    forms['create-account'].elements.push({
-      name: 'username',
-      title: 'Choose your username',
-      type: 'text',
-      required: true,
-      weight: 0
-    });
-
-    forms['edit-account'].elements.push({
-      name: 'username',
-      title: 'Username',
-      type: 'text',
-      required: true,
-      weight: -15
-    });
+    // Remove username field to edit-account form.
+    forms['edit-account'].elements.splice(0, 1);
   }
 
   callback();
-}
+};
 
 /**
  * The navigation() hook.
  */
 user.navigation = function(navigations, callback) {
-
   if (this.settings.emailAsUsername) {
     navigations['user-links'].items[0].title = ':email|user';
   }
 
   callback();
-}
+};

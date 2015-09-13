@@ -41,21 +41,17 @@ angular.module('choko')
     };
   }])
 
-  // @todo: Verify if the directives ckReplaceAndRecompile, ckReplaceElement
-  // and ckButtonOld are using.
-
   // A helper service to handle re-compiling of directives.
   .factory('ckReplaceAndRecompile', ['$compile', function ($compile) {
-    /**
-     * Creates a new element from the given, copying attributes but removing
-     * the old directive to avoid running it again. Recompiles the new
-     * element and replaces the old with it.
-     */
+
+    // Creates a new element from the given, copying attributes but removing
+    // the old directive to avoid running it again. Recompiles the new
+    // element and replaces the old with it.
     return function (element, directiveToRemove, scope, newTag) {
 
       // Handle multiple removals using a array of removing directives.
-      var directives  = directiveToRemove.length ? directiveToRemove : [];
-      var tagName     = element.prop('localName');
+      var directives = directiveToRemove.length ? directiveToRemove : [];
+      var tagName = element.prop('localName');
       var replacement;
 
       // Replace the directive, be it a tag name or attribute.
@@ -67,7 +63,8 @@ angular.module('choko')
           });
           element.replaceWith(replacement);
           element = replacement;
-        } else {
+        }
+        else {
           element.removeAttr(directive);
         }
       });

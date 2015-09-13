@@ -1,6 +1,6 @@
 {
   "name": "choko",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "High performance and high level web application framework.",
   "scripts": {
     "postinstall": "node_modules/.bin/bower install"
@@ -32,6 +32,7 @@
     "passport-local": "0.1.x",
     "path-to-regexp": "0.1.x",
     "prana": "0.1.x",
+    "prompt": "0.2.x",
     "sails-mongo": "0.11.x",
     "validator": "3.41.x",
     "waterline": "0.10.x",
@@ -39,6 +40,9 @@
   },
   "devDependencies": {
     "bower": "*",
+    "gulp": "*",
+    "gulp-bower": "*",
+    "gulp-git": "*",
     "mocha": "*",
     "supertest": "0.13.x"
   },

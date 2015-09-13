@@ -3,6 +3,13 @@
   "description": "Sign in to continue.",
   "elements": [
     {
+      "name": "username",
+      "placeholder": "Username",
+      "type": "text",
+      "required": true,
+      "weight": 0
+    },
+    {
       "name": "password",
       "placeholder": "Password",
       "type": "password",

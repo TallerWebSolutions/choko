@@ -845,7 +845,6 @@ user.messages = function(name) {
 
   messages['provide'] = 'Please provide an ' + loginFieldName + ' and a password.';
   messages['invalid'] = 'Invalid ' + loginFieldName + ' or password.';
-
   messages['not-available'] = 'This ' + accountFieldName + ' is not available, please choose another one.';
 
   return messages[name];
@@ -879,16 +878,15 @@ user.form = function(forms, callback) {
   }
 
   callback();
-}
+};
 
 /**
  * The navigation() hook.
  */
 user.navigation = function(navigations, callback) {
-
   if (this.settings.emailAsUsername) {
     navigations['user-links'].items[0].title = ':email|user';
   }
 
   callback();
-}
+};

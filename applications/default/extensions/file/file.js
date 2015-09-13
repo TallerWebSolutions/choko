@@ -221,7 +221,8 @@ file.createPathAndSave = function(filePath, data, callback) {
     // a number suffix.
     if (exists) {
       fs.writeFile(filePath, data, callback);
-    } else {
+    }
+    else {
       utils.mkdir(dirName, function(error) {
         if (error) {
           return callback(error);

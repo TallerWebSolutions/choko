@@ -63,7 +63,6 @@ rest.route = function(routes, callback) {
     newRoutes['/rest' + type.path] = {
       middleware: passport.authenticate(['basic', 'anonymous']),
       callback: function(request, response, callback) {
-
         if (request.method == 'GET') {
           // @todo: filter out dangerous stuff from query before passing it to
           // list() method?

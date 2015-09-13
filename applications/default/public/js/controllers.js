@@ -1,6 +1,5 @@
 'use strict';
 
-
 /**
  * @file Choko core controllers.
  */
@@ -16,26 +15,26 @@ angular.module('choko')
 
       $http.get(path)
         .success(function(data, status, headers, config) {
-          if (data.data.redirect) {
+          if (data.redirect) {
             // Server returned a redirect.
-            if (data.data.url) {
-              return window.location.href = data.data.redirect;
+            if (data.url) {
+              return window.location.href = data.redirect;
             } else {
-              return $location.path(data.data.redirect);
+              return $location.path(data.redirect);
             };
           }
 
           // Rebuild the layout only when context changes.
-          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.data.contexts.toString()) {
+          if ($rootScope.contexts instanceof Array && $rootScope.contexts.toString() == data.contexts.toString()) {
             // Update only panels in content region, and page information.
             // @todo: get the region the page-content panel is attached to
             // dinamically currently this is hadcoded to 'content' and will not work
             // if the page-content panel is attacehd to a different region.
-            $rootScope.panels['content'] = data.data.panels['content'];
-            $rootScope.page = data.data.page;
+            $rootScope.panels['content'] = data.panels['content'];
+            $rootScope.page = data.page;
           } else {
             // Merge data from the server.
-            angular.extend($rootScope, data.data);
+            angular.extend($rootScope, data);
 
             // Store scope as application state.
             applicationState.set($rootScope);
@@ -43,7 +42,7 @@ angular.module('choko')
         })
         .error(function(data, status, headers, config) {
           // Merge data from the server.
-          angular.extend($rootScope.page, data.data);
+          angular.extend($rootScope.page, data);
 
           $rootScope.page.template = '/templates/error.html';
 
@@ -63,11 +62,29 @@ angular.module('choko')
 .controller('ItemController', ['$scope',
   function($scope) {
 
+    // Verify if exist items and item objects.
+    if ($scope.items && $scope.item) {
+
+      // Method to delete current element from items array.
+      $scope.delete = function() {
+
+        // Expose removingItem promise into the $scope.
+        var removingItem = $scope.removingItem = $scope.item.remove();
+
+        removingItem.then(function(removedItem) {
+          $scope.items.forEach(function(item, index) {
+            if (item.id === removedItem.id) {
+              $scope.items.splice(index, 1);
+            }
+          });
+        });
+      };
+    }
   }
 ])
 
-.controller('ViewController', ['$scope', '$location', '$http', 'Choko', 'Restangular', 'Params', 'Token',
-  function($scope, $location, $http, Choko, Restangular, Params, Token) {
+.controller('ViewController', ['$scope', '$location', '$http', '$controller', 'Choko', 'Restangular', 'Params', 'Token',
+  function($scope, $location, $http, $controller, Choko, Restangular, Params, Token) {
 
     // Prevente creation of service if no itemType set.
     if ($scope.view.itemType) {
@@ -134,27 +151,39 @@ angular.module('choko')
           }
         });
       }
+
+      $scope.$on($scope.view.itemType+'List', function(event, param) {
+        // Verify if param is a function to execute.
+        if (param && angular.isFunction(param)) {
+          param.call(this, $scope);
+        }
+      });
     }
 
     // Handle 'item' type views.
     if ($scope.view.type === 'item' && $scope.view.itemType) {
-
       $scope.data = {};
-      $scope.view.title = '';
 
       // Expose view item promise to scope
       $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get();
 
       $scope.viewItem.then(function(response) {
-        $scope.data = response;
-        $scope.view.title = response.title;
+        $scope.data = response || {};
+        $scope.view.title = $scope.data.title || $scope.view.title;
       }, function(response) {
         // Error.
         if ($scope.page) {
           // If it's a page, show error, otherwise fail silently.
           $scope.data = response.data;
-          $scope.view.title = response.data.title;
+          $scope.view.title = response.data.title || null;
           $scope.view.template = '/templates/error.html';
+        }
+      });
+
+      $scope.$on($scope.view.itemType+'Item:'+ $scope.view.itemKey, function(event, param) {
+        // Verify if param is a function to execute.
+        if (param && angular.isFunction(param)) {
+          param.call(this, $scope);
         }
       });
     }
@@ -164,13 +193,20 @@ angular.module('choko')
       var typeForm = 'post';
       var itemREST = null;
 
+      $scope.viewForm;
       $scope.data = {};
+
       $scope.buildForm = function() {
         Choko.get({
           type: 'form',
           key: $scope.view.formName
         }, function(response) {
           $scope.form = response;
+
+          if ($scope.form.typeName) {
+            // Create a service for Itemtype.
+            itemTypeREST = Restangular.service($scope.form.typeName);
+          }
 
           if ($scope.form.mainTypeName) {
             $scope.data.type = $scope.form.shortName;
@@ -205,7 +241,12 @@ angular.module('choko')
         $scope.buildForm();
       }
 
-      $scope.submit = function(url, redirect) {
+      $scope.submit = function(url) {
+
+        // Replace tokens in url.
+        if (url) {
+          url = Token.replace(url, $scope);
+        }
 
         // Add params to data if any.
         Object.keys($scope.view.params || {}).forEach(function(param) {
@@ -218,9 +259,18 @@ angular.module('choko')
           if (url) {
             $scope.viewForm = Restangular.oneUrl('url', url).post('', $scope.data);
           } else {
-            $scope.viewForm = typeForm === 'post' ?
-              itemTypeREST.post($scope.data) :
-              $scope.data.put();
+
+            if (typeForm === 'post') {
+              $scope.viewForm = itemTypeREST.post($scope.data);
+            } else {
+
+              // Verify if the keyProperty field have the same itemKey value.
+              if ($scope.data.id !== $scope.view.itemKey) {
+                $scope.data.id = $scope.view.itemKey;
+              }
+
+              $scope.viewForm = $scope.data.put();
+            }
           }
         }
 
@@ -239,10 +289,17 @@ angular.module('choko')
           }
 
         }, function(response) {
-          $scope.errors = response.data.data;
+          $scope.errors = response.data;
           $scope.status = response.status;
         });
       };
+    }
+
+    // Inherit controller.
+    if ($scope.view.extendController) {
+      $controller($scope.view.extendController, {
+        $scope: $scope
+      });
     }
   }
 ]);

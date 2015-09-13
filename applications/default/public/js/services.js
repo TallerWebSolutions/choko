@@ -4,34 +4,28 @@
  * @file Choko core services.
  */
 
-// Append services to main choko module.
+
 angular.module('choko')
 
-  // Choko main REST factory.
+  // Single value service for Choko version.
+  .value('version', '0.0.1')
+
   .factory('Choko', ['$resource', function($resource) {
-    var url = '/rest/:type/:key';
-    var defaultParams = {
+    return $resource('/rest/:type/:key', {
       type: '@type',
       key: '@key'
-    };
-    var actions = {
+    },
+    {
       'get': {
         method: 'GET',
-        transformResponse: function (data) {
-          return angular.fromJson(data).data;
-        },
-        // Server will always return an object containing at least a 'data'
-        // property to hold the actual data and a status property.
+        // Data is an Object, not an Array.
         isArray: false
       }
-    }
-
-    return $resource(url, defaultParams, actions);
+    });
   }])
 
-  // Application state wrapper, to be shared across controllers.
-  // P.s.: States are actual scope objects.
-  .factory('applicationState', function() {
+  // Shared server with application state.
+  .factory('applicationState', ['$rootScope', function($rootScope) {
     var state = {};
     return {
       get: function() {
@@ -41,7 +35,7 @@ angular.module('choko')
         return state = newState;
       }
     };
-  })
+  }])
 
   // Token strings contain embedded parameters that can be replaced.
   .factory('Token', ['Params', function(Params) {
@@ -90,6 +84,20 @@ angular.module('choko')
     this.addParser('item', function () {
       return function (param, $scope) {
         return $scope.item && $scope.item[param] || null;
+      }
+    });
+
+    // Register items properties parser.
+    this.addParser('items', function () {
+      return function (param, $scope) {
+        return $scope.items && $scope.items[param] || null;
+      }
+    });
+
+    // Register data properties parser.
+    this.addParser('data', function () {
+      return function (param, $scope) {
+        return $scope.data && $scope.data[param] || null;
       }
     });
 

@@ -13,7 +13,7 @@
       "name": "submit",
       "title": "Save",
       "type": "submit",
-      "url": "/settings/edit-account-submit",
+      "url": "/settings/edit-account-submit/[:id|user]",
       "weight": 15
     }
   ]

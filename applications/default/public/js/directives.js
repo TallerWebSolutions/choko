@@ -8,7 +8,7 @@
 angular.module('choko')
 
   // Directive to replace any tag with overridable templates from the server.
-  .directive('ckReplace', ['$http', '$compile', function($http, $compile) {
+  .directive('ckReplace', ['$http', '$compile', "$templateCache", function($http, $compile, $templateCache) {
     return {
       restrict: 'EA',
 
@@ -17,25 +17,30 @@ angular.module('choko')
       priority: 100,
       compile: function(element, attrs) {
          return function(scope, element, attrs) {
+          var chachedTemplate = $templateCache.get(attrs.ckReplace || attrs.src);
 
-          // Request the template content.
-          var loadTemplate = $http({
-            method: 'GET',
-            // If the directive is an element, "src" should be available.
-            url: attrs.ckReplace || attrs.src,
-            cache: true
-          });
+          if (!chachedTemplate) {
+            // Request the template content.
+            var loadTemplate = $http({
+              method: 'GET',
+              // If the directive is an element, "src" should be available.
+              url: attrs.ckReplace || attrs.src,
+              cache: true
+            });
 
-          // When ready, compile the retrieved template.
-          loadTemplate.then(function(result) {
+            // When ready, compile the retrieved template.
+            loadTemplate.then(function(result) {
+              // Compile the returned template.
+              var compiled = $compile(result.data)(scope);
 
-            // Compile the returned template.
-            var compiled = $compile(result.data)(scope);
+              // Replace old element with compiled one.
+              element.replaceWith(angular.element(compiled));
+            });
 
-            // Replace old element with compiled one.
+          } else {
+            var compiled = $compile(chachedTemplate)(scope);
             element.replaceWith(angular.element(compiled));
-
-          });
+          }
         };
       }
     };

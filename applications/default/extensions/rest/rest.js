@@ -99,7 +99,7 @@ rest.route = function(routes, callback) {
       middleware: passport.authenticate(['basic', 'anonymous']),
       callback: function(request, response, callback) {
         if (request.method == 'GET') {
-          return typeModel.load(request.params[paramName], callback);
+          return typeModel.load(request.params[paramName], callback, request.query);
         }
         if (request.method == 'PUT') {
           // Force key to avoid updating the wrong item if another key is passed

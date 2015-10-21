@@ -197,7 +197,8 @@ user.type = function(types, callback) {
         type: 'reference',
         reference: {
           type: 'role',
-          multiple: true
+          multiple: true,
+          forceArray: true
         }
       },
       active: {
@@ -336,7 +337,8 @@ user.type = function(types, callback) {
         type: 'reference',
         reference: {
           type: 'permission',
-          multiple: true
+          multiple: true,
+          forceArray: true
         }
       }
     },

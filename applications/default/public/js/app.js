@@ -4,19 +4,16 @@
  * @file Main AngularJS module for the choko application.
  */
 
-// Define core choko dependencies.
-var dependencies = [
-  'ngRoute',
-  'ngResource',
-  'ngSanitize',
-  'summernote',
-  'restangular',
-  'angularFileUpload',
-  'ui.select'
-];
-
-// Declare main choko module.
-angular.module('choko', dependencies)
+// Declare app level module which depends on services, directives and filters.
+angular.module('choko', [
+    'ngRoute',
+    'ngResource',
+    'ngSanitize',
+    'summernote',
+    'restangular',
+    'ngFileUpload',
+    'ui.select'
+  ])
 
   // Location/routing configuration.
   .config(['$locationProvider',
@@ -27,6 +24,7 @@ angular.module('choko', dependencies)
       });
     }
   ])
+
   .config(['RestangularProvider',
     function(RestangularProvider) {
       RestangularProvider.setBaseUrl('/rest');
@@ -40,8 +38,8 @@ angular.module('choko', dependencies)
 
       // Add a response intereceptor
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-        var extractedData,
-          convertDateStringsToDates = function (input) {
+        var extractedData;
+        var convertDateStringsToDates = function (input) {
             var regexIso8601 = /^(\d{4}|\+\d{6})(?:-(\d{2})(?:-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})\.(\d{1,})(Z|([\-+])(\d{2}):(\d{2}))?)?)?)?$/;
 
             // Ignore things that aren't objects.
@@ -85,5 +83,15 @@ angular.module('choko', dependencies)
 
         return extractedData;
       });
+
+      RestangularProvider.setFullRequestInterceptor(function(element, operation, route, url, headers, params, httpConfig) {
+        return {
+          element: element,
+          params: params,
+          headers: headers,
+          httpConfig: _.extend({paramSerializer: '$httpParamSerializerJQLike'}, httpConfig)
+        };
+      });
+
     }
   ]);

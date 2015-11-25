@@ -323,3 +323,49 @@ angular.module('choko')
       return item;
     };
 }])
+
+.controller('AutocompleteElementController', ['$scope', '$controller', 'Choko',
+  function($scope, $controller, Choko){
+    // Inherit ElementController.
+    $controller('ReferenceElementController', {
+      $scope: $scope
+    });
+
+    $scope.options = []
+    $scope.selectedItems = [];
+    $scope.filter = {};
+
+    $scope.element.options.$promise.then(function(options) {
+      delete options.$promise;
+      delete options.$resolved;
+
+      if (options) {
+        Object.keys(options).forEach(function (name) {
+          $scope.options.push(options[name]);
+        });
+      }
+
+      var selectedTags = $scope.data[$scope.element.name] || [];
+
+      if (Array.isArray(selectedTags)) {
+        var selectedItems = [];
+        selectedTags.forEach(function (index) {
+          selectedItems.push(options[index]);
+        });
+
+        $scope.selectedItems = selectedItems;
+      }
+    });
+
+    $scope.onRemoveItem = function (item, model) {
+      var indexItem = $scope.data[$scope.element.name].indexOf(model);
+
+      if (indexItem > -1) {
+        $scope.data[$scope.element.name].splice(indexItem, 1);
+      }
+    };
+
+    $scope.onSelectItem = function (item, model) {
+      $scope.data[$scope.element.name].push(model);
+    };
+}])

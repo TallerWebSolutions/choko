@@ -180,8 +180,8 @@ field.field = function(fields, callback) {
   }
 
   function createUpdateTags(settings, item, next) {
-    if ('element' in settings && 'type' in settings.element && settings.element.type === 'tag') {
 
+    if (settings.element && settings.element.type && settings.element.type === 'tag') {
       if (settings.reference.multiple) {
         var referencedItems = item[settings.name];
         item[settings.name] = [];

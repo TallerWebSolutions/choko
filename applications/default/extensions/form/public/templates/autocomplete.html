@@ -1,0 +1,28 @@
+<div style="position: relative; ">
+  <div ck-autocomplete-element class="form-group">
+    <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
+
+    <div ng-if="element.reference.multiple">
+      <ui-select multiple ng-model="selectedItems" title="Choose a option" theme="bootstrap"
+        ng-disabled="disabled"
+        on-remove="onRemoveItem($item, $model)"
+        on-select="onSelectItem($item, $model)">
+        <ui-select-match placeholder="{{element.placeholder || 'Select options in the list or search'}}">{{$item[element.reference.titleField]}}</ui-select-match>
+        <ui-select-choices repeat="option.id as option in options | propsFilter: {name: $select.search}">
+          <div ng-bind-html="option.name | highlight: $select.search"></div>
+        </ui-select-choices>
+      </ui-select>
+    </div>
+
+    <div ng-if="!element.reference.multiple">
+      <ui-select ng-model="data[element.name]" theme="bootstrap" ng-disabled="disabled" title="Choose a option">
+        <ui-select-match placeholder="{{element.placeholder || 'Select a option in the list or search'}}">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="option.id as option in options | propsFilter: {name: $select.search}">
+          <div ng-bind-html="option.name | highlight: $select.search"></div>
+        </ui-select-choices>
+      </ui-select>
+    </div>
+
+    <p ng-if="element.description" class="help-block">{{element.description}}</p>
+  </div>
+</div>

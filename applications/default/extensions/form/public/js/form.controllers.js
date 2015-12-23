@@ -175,13 +175,18 @@ angular.module('choko')
       $scope.data = {};
 
       $scope.saveItem = function(key) {
+        var arg = this.element.arguments;
+
         // @todo: validate item.
         // Add item and cleanup data container and items.
         if (key != undefined) {
-          $scope.items[key] = $scope.data;
+          $scope.items[key] = $scope.data[$scope.subform.name];
+        }
+        else if (arg && arg.key > -1) {
+          $scope.items[arg.key] = $scope.data[$scope.subform.name];
         }
         else {
-          $scope.items.push($scope.data);
+          $scope.items.push($scope.data[$scope.subform.name]);
         }
         $scope.data = {};
 
@@ -227,7 +232,9 @@ angular.module('choko')
             title: 'Save',
             type: 'button',
             click: 'saveItem',
-            arguments: [key],
+            arguments: {
+              key: key
+            },
             classes: ['btn-default'],
             weight: 15
           });
@@ -267,7 +274,10 @@ angular.module('choko')
   function ($scope) {
 
     $scope.editItem = function() {
-      $scope.setSubForm($scope.typeName(), !!$scope.element.reference.subtypes, $scope.item, $scope.key);
+      var data = {};
+
+      data[$scope.element.name] = $scope.item;
+      $scope.setSubForm($scope.typeName(), !!$scope.element.reference.subtypes, data, $scope.key);
     };
 
     $scope.typeName = function() {

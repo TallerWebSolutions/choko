@@ -133,7 +133,12 @@ angular.module('choko')
     });
 
     // Initialize data container if needed.
-    $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || [];
+    if ($scope.element.reference.multiple) {
+      $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || [];
+    }
+    else {
+      $scope.data[$scope.element.name] = $scope.data[$scope.element.name] || undefined;
+    }
 
     // Toggle selection for a given option by name.
     $scope.toggleSelection = function(option) {

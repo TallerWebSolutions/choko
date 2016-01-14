@@ -22,7 +22,7 @@
     "express": "4.13.x",
     "express-query-boolean": "^1.0.0",
     "express-session": "1.11.x",
-    "lodash": "2.x.x",
+    "lodash": "~3.x",
     "method-override": "2.3.x",
     "mkdirp": "0.5.x",
     "multer": "0.1.x",

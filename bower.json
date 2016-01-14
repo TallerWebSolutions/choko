@@ -11,7 +11,7 @@
     "font-awesome": "4.4.x",
     "jquery": "1.11.x",
     "ng-file-upload": "7.0.x",
-    "restangular": "1.5.x",
+    "restangular": "sssilver/restangular#master",
     "summernote": "0.6.x",
     "ui-select": "angular-ui/ui-select#master"
   }

@@ -22,8 +22,8 @@ angular.module('choko')
     $scope.element.id = $scope.element.id || 'element-' + $scope.form.name + '-' + elementName;
   }])
 
-.controller('FileElementController', ['$scope', '$controller', '$upload',
-  function ($scope, $controller, $upload) {
+.controller('FileElementController', ['$scope', '$controller', 'Upload',
+  function ($scope, $controller, Upload) {
     // Inherit ElementController.
     $controller('ElementController', {
       $scope: $scope
@@ -52,7 +52,7 @@ angular.module('choko')
     $scope.onFileSelect = function($files) {
       for (var i = 0; i < $files.length; i++) {
         var file = $files[i];
-        $scope.upload = $upload.upload({
+        $scope.upload = Upload.upload({
           url: '/file',
           file: file
         })

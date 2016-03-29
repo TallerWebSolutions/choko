@@ -12,6 +12,7 @@
   ],
   "repository": "git://github.com/recidive/choko.git",
   "dependencies": {
+    "q": "^1.4.x",
     "async": "1.4.x",
     "body-parser": "1.13.x",
     "colors": "1.1.x",

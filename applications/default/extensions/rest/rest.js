@@ -1,6 +1,7 @@
 var async = require('async');
 var passport = require('passport');
 var utils = require('prana').utils;
+var q = require('q');
 
 var rest = module.exports;
 
@@ -93,20 +94,40 @@ rest.route = function(routes, callback) {
       router: 'rest'
     };
 
+    var loadReference = function(ref) {
+      return q.Promise(function(resolve, reject) {
+        typeModel.load(ref, function(err, model) {
+          if (err) return reject(err);
+          resolve(model);
+        });
+      });
+    };
+
     // Get, update or delete an item.
     var paramName = utils.hyphensToCamelCase(typeName);
     newRoutes['/rest' + type.path + '/:' + paramName] = {
       middleware: passport.authenticate(['basic', 'anonymous']),
       callback: function(request, response, callback) {
-        if (request.method == 'GET') {
-          return typeModel.load(request.params[paramName], callback);
-        }
-        if (request.method == 'PUT') {
-          // Force key to avoid updating the wrong item if another key is passed
-          // in request body.
-          request.body[type.keyProperty] = request.params[paramName];
-          return typeModel.validateAndSave(request.body, validationResponseCallback(callback));
-        }
+        var isGET = request.method === 'GET';
+        var isPUT = request.method === 'PUT';
+        var putParams = request.body || {};
+        var reference = request.params[paramName];
+
+        if (isGET) return loadReference(reference).then(function(model) {
+          callback(null, model);
+        }).catch(callback);
+
+        if (isPUT) return loadReference(reference).then(function(model) {
+          Object.keys(putParams).forEach(function(param) {
+            var isPrimaryKey = param === type.keyProperty;
+            if (isPrimaryKey) return;
+
+            model[param] = putParams[param];
+          });
+
+          typeModel.validateAndSave(model, validationResponseCallback(callback));
+        }).catch(callback);
+
         if (request.method == 'POST' || request.method == 'PATCH') {
           return typeModel.load(request.params[paramName], function(error, item) {
             if (error) {

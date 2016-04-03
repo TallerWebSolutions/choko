@@ -96,8 +96,8 @@ angular.module('choko')
     };
   }])
 
-.controller('ReferenceElementController', ['$scope', '$controller', 'Choko', 'Params',
-  function ($scope, $controller, Choko, Params) {
+.controller('ReferenceElementController', ['$scope', '$controller', 'Choko', 'Token',
+  function ($scope, $controller, Choko, Token) {
     // Inherit ElementController.
     $controller('ElementController', {
       $scope: $scope
@@ -105,12 +105,12 @@ angular.module('choko')
 
     // Parse query reference params.
     Object.keys($scope.element.reference.query || {}).forEach(function(param) {
-      $scope.element.reference.query[param] = Params.parse($scope.element.reference.query[param], $scope);
+      $scope.element.reference.query[param] = Token.replace($scope.element.reference.query[param], $scope);
     });
 
     // Parse other reference params.
     Object.keys($scope.element.reference.params || {}).forEach(function(param) {
-      $scope.element.reference.params[param] = Params.parse($scope.element.reference.params[param], $scope);
+      $scope.element.reference.params[param] = Token.replace($scope.element.reference.params[param], $scope);
     });
 
     var query = {

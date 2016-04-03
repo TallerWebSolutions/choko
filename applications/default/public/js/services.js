@@ -40,9 +40,12 @@ angular.module('choko')
 
     return {
       replace: function(params, scope) {
+        if (typeof params != 'string') return params;
+
         var replaced = params.replace(pattern, function(match, subMatch) {
           return Params.parse(subMatch, scope);
         });
+
         return replaced;
       }
     };

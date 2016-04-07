@@ -50,5 +50,6 @@
   "bin": {
     "choko": "bin/choko"
   },
-  "preferGlobal": true
+  "preferGlobal": true,
+  "engine": "node >= 4.x"
 }

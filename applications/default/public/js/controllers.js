@@ -85,8 +85,7 @@ angular.module('choko')
 
 .controller('ViewController', ['$scope', '$location', '$http', '$controller', 'Choko', 'Restangular', 'Params', 'Token',
   function($scope, $location, $http, $controller, Choko, Restangular, Params, Token) {
-
-    var requestParams = {};
+    var condition = {};
 
     // Prevente creation of service if no itemType set.
     if ($scope.view.itemType) {
@@ -95,21 +94,21 @@ angular.module('choko')
     }
     // Parse parameters when needed.
     if (typeof $scope.view.itemKey !== 'undefined') {
-      $scope.view.itemKey = Params.parse($scope.view.itemKey, $scope);
+      $scope.view.itemKey = Token.replace($scope.view.itemKey, $scope);
     }
 
-    // Parse other params.
+    // Parse params.
     Object.keys($scope.view.params || {}).forEach(function(param) {
-      $scope.view.params[param] = Params.parse($scope.view.params[param], $scope);
+      $scope.view.params[param] = Token.replace($scope.view.params[param], $scope);
     });
 
     // Parse query params.
     Object.keys($scope.view.query || {}).forEach(function(param) {
       if (typeof $scope.view.query[param] === 'string') {
-        $scope.view.query[param] = Params.parse($scope.view.query[param], $scope);
+        $scope.view.query[param] = Token.replace($scope.view.query[param], $scope);
       } else if (typeof $scope.view.query[param] === 'object') {
         Object.keys($scope.view.query[param]).forEach(function(subparam) {
-          $scope.view.query[param][subparam] = Params.parse($scope.view.query[param][subparam], $scope);
+          $scope.view.query[param][subparam] = Token.replace($scope.view.query[param][subparam], $scope);
         })
       }
     });
@@ -119,21 +118,15 @@ angular.module('choko')
       $scope.view.title = Token.replace($scope.view.title, $scope);
     }
 
-    if ($scope.view.requestParams) {
-      angular.extend(requestParams, $scope.view.requestParams);
-    }
-
     if ($scope.view.query) {
-      requestParams.query = {};
-
-      angular.extend(requestParams.query, $scope.view.query);
+      angular.extend(condition, $scope.view.query);
     }
 
     // Handle 'list' type views.
     if ($scope.view.type === 'list' && $scope.view.itemType) {
 
       // Expose view list promise to scope
-      $scope.viewList = itemTypeREST.getList(requestParams);
+      $scope.viewList = itemTypeREST.getList(condition);
       $scope.items = {};
 
       $scope.viewList.then(function(response) {
@@ -178,7 +171,7 @@ angular.module('choko')
       $scope.data = {};
 
       // Expose view item promise to scope
-      $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get(requestParams);
+      $scope.viewItem = itemTypeREST.one($scope.view.itemKey).get(condition);
 
       $scope.viewItem.then(function(response) {
         $scope.data = response || {};
@@ -242,7 +235,7 @@ angular.module('choko')
 
         // Load item data for editing.
         itemTypeREST.one($scope.view.itemKey)
-          .get(requestParams)
+          .get(condition)
           .then(function(response) {
             $scope.data = response;
             $scope.buildForm();

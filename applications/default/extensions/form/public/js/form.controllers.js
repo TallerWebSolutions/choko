@@ -309,27 +309,55 @@ angular.module('choko')
       $scope: $scope
     });
 
-    $scope.tags = []
+    $scope.options = []
+    $scope.selectedItems = {};
     $scope.filter = {};
 
     $scope.element.options.$promise.then(function(options) {
       delete options.$promise;
       delete options.$resolved;
 
-      if(options) {
+      if (options) {
         Object.keys(options).forEach(function (name) {
-          if (options[name].isTag) delete options[name].isTag;
-          $scope.tags.push(options[name]);
+          $scope.options.push(options[name]);
         });
       }
 
       var selectedTags = $scope.data[$scope.element.name] || [];
-      $scope.data[$scope.element.name] = [];
 
-      selectedTags.forEach(function(selectedTag) {
-        $scope.data[$scope.element.name].push(options[selectedTag]);
-      });
+      if (Array.isArray(selectedTags)) {
+        var selectedItems = [];
+        selectedTags.forEach(function (index) {
+          selectedItems.push(options[index]);
+        });
+
+        $scope.selectedItems.items = selectedItems;
+      }
     });
+
+    function filterItems(arr, fieldName, value) {
+      return arr.filter(function (item) {
+        return item[fieldName] !== value;
+      })
+    }
+
+    $scope.onRemoveItem = function (item) {
+      if (item.id) {
+        var index = $scope.data[$scope.element.name].indexOf(item.id);
+        $scope.data[$scope.element.name].splice(index, 1);
+      } else {
+        $scope.data[$scope.element.name] = filterItems($scope.data[$scope.element.name], 'name', item.name);
+      }
+    };
+
+    $scope.onSelectItem = function (item) {
+      if (item.id) {
+        $scope.data[$scope.element.name].push(item.id);
+      } else {
+        delete item.isTag;
+        $scope.data[$scope.element.name].push(item);
+      }
+    };
 
     $scope.tagTransform = function (newTag) {
       var item = {};

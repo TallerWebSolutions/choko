@@ -1,27 +1,15 @@
 <div ck-tag-element class="form-group">
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
-  <ui-select
-    multiple
-    tagging="tagTransform"
-    ng-model="data[element.name]"
-    theme="bootstrap"
+
+  <ui-select multiple tagging="tagTransform" tagging-label="(custom 'new' label)" ng-model="selectedItems.items" title="Choose a option" theme="bootstrap"
+    sortable="true"
     ng-disabled="disabled"
-    reset-search-input="true"
-    style="width: 100%;"
-    title="Choose a tag"
-    id="{{element.id}}">
-
-    <ui-select-match ng-attr-placeholder="{{element.placeholder}}">{{$item[element.reference.titleField]}}</ui-select-match>
-
-    <ui-select-choices repeat="tag in tags | propsFilter: {title: $select.search}">
-      <div
-        ng-if="tag.isTag"
-        ng-bind-html="tag[element.reference.titleField] +' <small>(new)</small>'| highlight: $select.search"></div>
-
-      <div
-        ng-if="!tag.isTag"
-        ng-bind-html="tag[element.reference.titleField] + tag.isTag| highlight: $select.search"></div>
-
+    on-remove="onRemoveItem($item, $model)"
+    on-select="onSelectItem($item, $model)">
+    <ui-select-match placeholder="{{element.placeholder || 'Select options in the list or search'}}">{{$item[element.reference.titleField]}}</ui-select-match>
+    <ui-select-choices repeat="option as option in options | propsFilter: {name: $select.search}">
+      <div ng-if="option.isTag" ng-bind-html="option.name +' <small>(new)</small>'| highlight: $select.search"></div>
+      <div ng-if="!option.isTag" ng-bind-html="option.name + option.isTag| highlight: $select.search"></div>
     </ui-select-choices>
   </ui-select>
 

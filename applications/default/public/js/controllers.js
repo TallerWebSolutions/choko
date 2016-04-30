@@ -201,7 +201,7 @@ angular.module('choko')
 
       $scope.viewForm;
       $scope.data = {};
-      $scope.view.formName = $scope.view.itemType ?
+      $scope.view.formName = $scope.view.itemType && !$scope.view.formName?
         'type-' + $scope.view.itemType :
         $scope.view.formName;
 

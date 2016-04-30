@@ -195,12 +195,15 @@ angular.module('choko')
     }
 
     // Handle 'form' type views.
-    if ($scope.view.type === 'form' && $scope.view.formName) {
+    if ($scope.view.type === 'form' && ($scope.view.itemType || $scope.view.formName)) {
       var typeForm = 'post';
       var itemREST = null;
 
       $scope.viewForm;
       $scope.data = {};
+      $scope.view.formName = $scope.view.itemType ?
+        'type-' + $scope.view.itemType :
+        $scope.view.formName;
 
       $scope.buildForm = function() {
         Choko.get({

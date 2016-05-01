@@ -31,8 +31,9 @@ angular.module('choko')
     };
   }])
 
-.controller('NavigationItemController', ['$scope', '$location', 'Params',
-  function ($scope, $location, Params) {
+.controller('NavigationItemController', ['$scope', '$location', 'Params', 'Token',
+  function ($scope, $location, Params, Token) {
     var item = $scope.subItem || $scope.item;
     item.title = Params.parse(item.title, $scope);
+    item.url = Token.replace(item.url, $scope);
   }]);

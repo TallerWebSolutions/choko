@@ -89,7 +89,7 @@ file.field = function(fields, callback) {
 
         file.path = path.join(settings.name, fileName);
         file.temporary = false;
-        file.save(next);
+        application.save('file', file, next);
       });
     });
   };

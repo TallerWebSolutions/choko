@@ -35,8 +35,12 @@ angular.module('choko')
     // @todo support multiple files.
 
     if (!$scope.subform) {
-
       var file = $scope.data[$scope.element.name] || null;
+
+      // Expose files object
+      $scope.files = $scope.files || {};
+      $scope.files[$scope.element.name] = file;
+
       $scope.data[$scope.element.name] = file instanceof Object ?
         $scope.data[$scope.element.name].id :
         null;
@@ -48,6 +52,14 @@ angular.module('choko')
         file.id :
         null;
     };
+
+    $scope.bytesToSize = function (bytes) {
+      var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      if (bytes == 0) return '0 Byte';
+
+      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    }
 
     $scope.onFileSelect = function($files) {
       for (var i = 0; i < $files.length; i++) {
@@ -62,13 +74,20 @@ angular.module('choko')
         .success(function(data, status, headers, config) {
           if (!$scope.subform) {
             $scope.data[$scope.element.name] = data.id;
+            $scope.files[$scope.element.name] = data;
           } else{
             $scope.data[$scope.subform.name][$scope.element.name] = data.id;
+            $scope.files[$scope.subform.name][$scope.element.name] = data;
           };
         });
       }
     };
-  }])
+
+    $scope.onRemove = function (name) {
+      $scope.progress = 0;
+      $scope.files[name] = $scope.data[name] = null;
+    }
+}])
 
 .controller('FormButtonController', ['$scope', '$controller',
   function ($scope, $controller) {

@@ -1,11 +1,21 @@
 <div ck-file-element class="form-group">
   <label ng-if="element.title" for="{{element.id}}">{{element.title}}</label>
-  <input ng-if="!element.isSubform" ng-model="data[element.name]" ng-required="element.required" ngf-select="onFileSelect($files)" type="file" class="form-control" name="{{element.name}}" id="{{element.id}}" placeholder="{{element.placeholder}}" >
-  <input ng-if="element.isSubform" ng-model="data[subform.name][element.name]" ng-required="element.required" ngf-select="onFileSelect($files)" type="file" class="form-control" name="{{element.name}}" id="{{element.id}}" placeholder="{{element.placeholder}}">
-  <p ng-if="element.description" class="help-block">{{element.description}}</p>
-  <div ng-show="progress" class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%;">
-      {{progress}}%
+
+  <div ng-show="!files[element.name]">
+    <input ng-if="!element.isSubform" ng-model="data[element.name]" ng-required="element.required" ngf-select="onFileSelect($files)" type="file" class="form-control" name="{{element.name}}" id="{{element.id}}" placeholder="{{element.placeholder}}" >
+    <input ng-if="element.isSubform" ng-model="data[subform.name][element.name]" ng-required="element.required" ngf-select="onFileSelect($files)" type="file" class="form-control" name="{{element.name}}" id="{{element.id}}" placeholder="{{element.placeholder}}">
+    <p ng-if="element.description" class="help-block">{{element.description}}</p>
+    <div ng-show="progress" class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%;">
+        {{progress}}%
+      </div>
     </div>
+  </div>
+
+  <div ng-show="files[element.name]" class="file-details">
+    <i class="fa fa-file-o" aria-hidden="true"></i>
+    <a href="{{files[element.name].path}}">{{files[element.name].filename}}</a>
+    <span>({{ bytesToSize(files[element.name].size) }})</span>
+    <button type="button" name="button" ng-click="onRemove(element.name)">Remove</button>
   </div>
 </div>

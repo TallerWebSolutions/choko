@@ -201,9 +201,7 @@ file.route = function(routes, callback) {
         }
 
         // Pass only the id that's what we need for now.
-        callback(null, {
-          id: file.id
-        });
+        callback(null, file);
       });
     }
   };

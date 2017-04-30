@@ -3,7 +3,7 @@
   "version": "0.0.6",
   "description": "High performance and high level web application framework.",
   "scripts": {
-    "postinstall": "node_modules/.bin/bower install"
+    "postinstall": "bower install"
   },
   "keywords": [
     "framework",

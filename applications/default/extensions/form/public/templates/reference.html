@@ -1,50 +1,52 @@
-<label ng-if="element.title && !element.reference.inline" for="{{element.id}}">{{element.title}}</label>
-<div ng-if="!element.reference.inline" ck-reference-element class="controls">
-  <div ng-if="element.reference.multiple" ng-repeat="(optionKey, option) in element.options" class="checkbox">
-    <label>
-      <input ng-checked="data[element.name].indexOf(optionKey) > -1" ng-click="toggleSelection(optionKey)" type="checkbox" value="optionKey">
-      {{element.reference.titleField ? option[element.reference.titleField] : option.title}}
-    </label>
+<div class="form-group">
+  <label ng-if="element.title && !element.reference.inline" for="{{element.id}}">{{element.title}}</label>
+  <div ng-if="!element.reference.inline" ck-reference-element class="controls">
+    <div ng-if="element.reference.multiple" ng-repeat="(optionKey, option) in element.options" class="checkbox">
+      <label>
+        <input ng-checked="data[element.name].indexOf(optionKey) > -1" ng-click="toggleSelection(optionKey)" type="checkbox" value="optionKey">
+        {{element.reference.titleField ? option[element.reference.titleField] : option.title}}
+      </label>
+    </div>
+
+    <div ng-if="!element.reference.multiple && fewOptions" ng-repeat="(optionKey, option) in element.options" class="radio">
+      <label>
+        <input ng-model="data[element.name]" type="radio" name="{{element.name}}" value="{{optionKey}}">
+        {{element.reference.titleField ? option[element.reference.titleField] : option.title}}
+      </label>
+    </div>
+    <select ng-if="!element.reference.multiple && !fewOptions" ng-model="data[element.name]" ng-required="element.required" class="form-control">
+      <option ng-repeat="(optionKey, option) in element.options" ng-bind-html="element.reference.titleField ? option[element.reference.titleField] : option.title" value="{{optionKey}}"></option>
+    </select>
   </div>
 
-  <div ng-if="!element.reference.multiple && fewOptions" ng-repeat="(optionKey, option) in element.options" class="radio">
-    <label>
-      <input ng-model="data[element.name]" type="radio" name="{{element.name}}" value="{{optionKey}}">
-      {{element.reference.titleField ? option[element.reference.titleField] : option.title}}
-    </label>
-  </div>
-  <select ng-if="!element.reference.multiple && !fewOptions" ng-model="data[element.name]" ng-required="element.required" class="form-control">
-    <option ng-repeat="(optionKey, option) in element.options" ng-bind-html="element.reference.titleField ? option[element.reference.titleField] : option.title" value="{{optionKey}}"></option>
-  </select>
-</div>
-
-<div ng-if="element.reference.inline" ck-inline-reference-element class="controls well">
-  <fieldset>
-    <p ng-if="items.length == 0">No items added yet.</p>
-    <div ng-if="items.length > 0" class="list-group">
-      <div ng-repeat="(key, item) in items" ck-inline-reference-element-item class="list-group-item">
-        <div ng-if="element.reference.itemTemplate" ng-include="element.reference.itemTemplate"></div>
-        <div ng-if="!element.reference.itemTemplate">
-          <button ng-click="removeItem($index)" type="button" class="close" aria-hidden="true">&times;</button>
-          <h4  class="list-group-item-heading"><a ng-click="editItem()">{{element.reference.titleField ? item[element.reference.titleField] : item.title}}</a>
+  <div ng-if="element.reference.inline" ck-inline-reference-element class="controls well">
+    <fieldset>
+      <p ng-if="items.length == 0">No items added yet.</p>
+      <div ng-if="items.length > 0" class="list-group">
+        <div ng-repeat="(key, item) in items" ck-inline-reference-element-item class="list-group-item">
+          <div ng-if="element.reference.itemTemplate" ng-include="element.reference.itemTemplate"></div>
+          <div ng-if="!element.reference.itemTemplate">
+            <button ng-click="removeItem($index)" type="button" class="close" aria-hidden="true">&times;</button>
+            <h4  class="list-group-item-heading"><a ng-click="editItem()">{{element.reference.titleField ? item[element.reference.titleField] : item.title}}</a>
+            </div>
+          </div>
         </div>
-      </div>
+        <legend>{{element.title}}</legend>
+
+        <div ng-if="element.reference.subtypes" class="btn-group btn-group-sm">
+          <button ng-if="!element.subform" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Add <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li ng-repeat="type in element.reference.subtypes"><a ng-click="setSubForm(type.name, true)">{{type.title}}</a></li>
+          </ul>
+        </div>
+
+        <button ng-if="!element.reference.subtypes && !element.subform" ng-click="setSubForm(element.reference.type)" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          <span class="fa fa-plus"></span>
+        </button>
+
+        <div ng-if="element.subform" ng-include="'/templates/subform.html'"></div>
+      </fieldset>
     </div>
-    <legend>{{element.title}}</legend>
-
-    <div ng-if="element.reference.subtypes" class="btn-group btn-group-sm">
-      <button ng-if="!element.subform" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-        Add <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" role="menu">
-        <li ng-repeat="type in element.reference.subtypes"><a ng-click="setSubForm(type.name, true)">{{type.title}}</a></li>
-      </ul>
-    </div>
-
-    <button ng-if="!element.reference.subtypes && !element.subform" ng-click="setSubForm(element.reference.type)" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      <span class="fa fa-plus"></span>
-    </button>
-
-    <div ng-if="element.subform" ng-include="'/templates/subform.html'"></div>
-  </fieldset>
 </div>

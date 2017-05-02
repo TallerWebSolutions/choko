@@ -26,7 +26,6 @@
     "method-override": "2.3.x",
     "mkdirp": "0.5.x",
     "multer": "0.1.x",
-    "node-uuid": "1.4.x",
     "passport": "0.1.x",
     "passport-anonymous": "1.0.x",
     "passport-http": "0.2.x",
@@ -35,6 +34,7 @@
     "prana": "0.1.x",
     "prompt": "0.2.x",
     "sails-mongo": "0.12.x",
+    "uuid": "^3.0.1",
     "validator": "3.41.x",
     "waterline": "0.12.x",
     "waterline-prana": "recidive/waterline-prana#master"

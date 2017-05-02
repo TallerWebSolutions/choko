@@ -1,6 +1,6 @@
 var async = require('async');
 var validator = require('validator');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var utils = require('prana').utils;
 
 var field = module.exports = {};

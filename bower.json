@@ -7,7 +7,7 @@
     "angular-sanitize": "1.5.x",
     "bootstrap": "3.3.x",
     "bootswatch": "3.3.x",
-    "font-awesome": "4.6.x",
+    "font-awesome": "4.7.x",
     "ui-select": "angular-ui/ui-select#v0.17.0",
     "restangular": "^1.5.2",
     "angular-summernote": "^0.8.1",

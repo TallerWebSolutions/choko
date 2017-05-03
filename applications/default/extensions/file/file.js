@@ -132,10 +132,12 @@ file.field = function(fields, callback) {
         return next(null, true);
       });
     },
-    find: function(settings, query, next) {
-      query.populate(settings.name);
-      next();
-    },
+    // @TODO: Validate if is necessary to execute this hook
+    // Now populate fields is support.
+    // find: function(settings, query, next) {
+    //   query.populate(settings.name);
+    //   next();
+    // },
     beforeCreate: function(settings, item, next) {
       var fileId = item[settings.name];
 

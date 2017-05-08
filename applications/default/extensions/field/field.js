@@ -59,6 +59,8 @@ field.field = function(fields, callback) {
     validate: function(settings, item, next) {
       // @todo: validate if value is within options when it's a select field.
 
+      if (!item[settings.name]) return next(null, true)
+
       // Default minLenght to 1.
       settings.minLength = settings.minLength || 1;
 

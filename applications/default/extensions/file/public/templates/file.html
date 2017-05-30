@@ -14,7 +14,7 @@
 
   <div ng-show="files[element.name]" class="file-details">
     <i class="fa fa-file-o" aria-hidden="true"></i>
-    <a href="/files/{{files[element.name].path}}">{{files[element.name].filename}}</a>
+    <a href="/files/{{files[element.name].path}}" target="_blank">{{files[element.name].filename}}</a>
     <span>({{ bytesToSize(files[element.name].size) }})</span>
     <button type="button" name="button" ng-click="onRemove(element.name)">Remove</button>
   </div>

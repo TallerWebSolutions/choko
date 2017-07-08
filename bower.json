@@ -1,18 +1,17 @@
 {
   "name": "choko",
   "dependencies": {
-    "angular": "1.4.x",
-    "angular-resource": "1.4.x",
-    "angular-route": "1.4.x",
-    "angular-sanitize": "1.4.x",
-    "angular-summernote": "0.5.x",
+    "angular": "1.5.x",
+    "angular-resource": "1.5.x",
+    "angular-route": "1.5.x",
+    "angular-sanitize": "1.5.x",
+    "angular-summernote": "0.8.x",
     "bootstrap": "3.3.x",
     "bootswatch": "3.3.x",
-    "font-awesome": "4.4.x",
-    "jquery": "1.11.x",
-    "ng-file-upload": "1.6.x",
+    "font-awesome": "4.7.x",
+    "jquery": "3.2.x",
+    "ng-file-upload": "12.2.x",
     "restangular": "1.5.x",
-    "summernote": "0.6.x",
-    "ui-select": "angular-ui/ui-select#master"
+    "angular-ui-select": "0.19.x"
   }
 }

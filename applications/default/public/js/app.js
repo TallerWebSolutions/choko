@@ -11,7 +11,7 @@ angular.module('choko', [
     'ngSanitize',
     'summernote',
     'restangular',
-    'angularFileUpload',
+    'ngFileUpload',
     'ui.select'
   ])
 
